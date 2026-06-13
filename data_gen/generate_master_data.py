@@ -12,13 +12,23 @@ Usage:
 
 import os
 import random
+import yaml
 import pandas as pd
 from datetime import datetime, timedelta
+from pathlib import Path
 
 SEED = 42
 random.seed(SEED)
 
-MASTER_DIR = "F:/ITI/17-Python/New Project/data/master"
+# -------------------------- Handling Paths --------------------------
+root = Path(__file__).resolve().parent.parent
+config_path = root / 'config/config.yaml'
+
+with open(config_path, 'r') as file:
+    data = yaml.safe_load(file)
+
+MASTER_DIR = root / data["Ingestion"]["Master"]
+# --------------------------------------------------------------------
 os.makedirs(MASTER_DIR, exist_ok=True)
 
 # Initial counts - these will grow as new customers/drivers are added

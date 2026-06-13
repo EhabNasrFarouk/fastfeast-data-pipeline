@@ -1,11 +1,21 @@
 import os
 import json
 import random
+import yaml
 import argparse
 import pandas as pd
 from datetime import datetime
+from pathlib import Path
 
-MASTER_DIR = "data/master"
+# -------------------------- Handling Paths --------------------------
+root = Path(__file__).resolve().parent.parent
+config_path = root / 'config/config.yaml'
+
+with open(config_path, 'r') as file:
+    data = yaml.safe_load(file)
+
+MASTER_DIR = root / data["Ingestion"]["Master"]
+# --------------------------------------------------------------------
 
 FIRST_NAMES_MALE = [
     "Ahmed", "Mohamed", "Omar", "Youssef", "Ali", "Hassan", "Hussein", "Mahmoud",
