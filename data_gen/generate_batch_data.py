@@ -1,13 +1,22 @@
 import os
 import json
+import yaml
 import random
 import argparse
 import pandas as pd
 from datetime import datetime
+from pathlib import Path
 
-MASTER_DIR = "F:/ITI/17-Python/New Project/data/master"
-BATCH_DIR = "F:/ITI/17-Python/New Project/data/input/batch"
+# -------------------------- Handling Paths --------------------------
+root = Path(__file__).resolve().parent.parent
+config_path = root / 'config/config.yaml'
 
+with open(config_path, 'r') as file:
+    data = yaml.safe_load(file)
+
+MASTER_DIR = root / data["Ingestion"]["Master"]
+BATCH_DIR = root / data["Ingestion"]["Batch"]
+# --------------------------------------------------------------------
 
 def load_master_data():
     """Load all master CSV files."""

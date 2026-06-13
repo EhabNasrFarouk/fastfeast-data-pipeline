@@ -1,1 +1,4 @@
-
+Ingestion:
+  Batch: data/input/batch
+  Stream: data/input/stream
+  Master: data/master
