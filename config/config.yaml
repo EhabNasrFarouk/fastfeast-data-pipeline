@@ -1,4 +1,262 @@
-Ingestion:
-  Batch: data/input/batch
-  Stream: data/input/stream
-  Master: data/master
+# ============================================================
+# FastFeast Data Pipeline — Configuration
+# ============================================================
+
+project:
+  name: fastfeast-data-pipeline
+  version: "1.0.0"
+  env: development                        # development | staging | production
+  timezone: Africa/Cairo
+
+# ─────────────────────────────────────────
+# PATHS
+# ─────────────────────────────────────────
+paths:
+  master_dir:        data/master
+  batch_dir:         data/input/batch
+  stream_dir:        data/input/stream
+  output_dir:        data/output
+  warehouse_dir:     warehouse
+  observability_dir: observability
+  reporting_dir:     reporting
+  logs_dir:          logs
+
+# ─────────────────────────────────────────
+# DATABASE — DuckDB
+# ─────────────────────────────────────────
+database:
+  duckdb:
+    path:         warehouse/fastfeast.duckdb
+    read_only:    false
+    threads:      4
+    memory_limit: "2GB"
+
+  schemas:
+    staging:   staging
+    clean:     clean
+    warehouse: warehouse
+    audit:     audit
+
+# ─────────────────────────────────────────
+# BATCH INGESTION
+# ─────────────────────────────────────────
+batch:
+  schedule:
+    day_of_week: thu
+    hour:        8
+    minute:      0
+
+  csv_tables:
+    - customers
+    - drivers
+    - agents
+    - regions
+    - reasons
+    - categories
+    - segments
+    - teams
+    - channels
+    - priorities
+    - reason_categories
+
+  json_tables:
+    - restaurants
+    - cities
+
+  type_overrides:
+    customers:
+      customer_id: int
+      region_id:   float
+      segment_id:  int
+    drivers:
+      driver_id:            int
+      region_id:            int
+      rating_avg:           float
+      on_time_rate:         float
+      cancel_rate:          float
+      completed_deliveries: int
+    agents:
+      agent_id: int
+      team_id:  float
+    restaurants:
+      restaurant_id:    int
+      region_id:        int
+      rating_avg:       float
+      prep_time_avg_min: int
+
+# ─────────────────────────────────────────
+# STREAM / MICRO-BATCH INGESTION
+# ─────────────────────────────────────────
+stream:
+  micro_batch_interval_minutes: 60
+
+  stream_files:
+    orders:
+      filename:  orders.json
+      format:    json
+      id_column: order_id
+    tickets:
+      filename:  tickets.csv
+      format:    csv
+      id_column: ticket_id
+    ticket_events:
+      filename:  ticket_events.json
+      format:    json
+      id_column: event_id
+
+# ─────────────────────────────────────────
+# VALIDATION RULES
+# ─────────────────────────────────────────
+validation:
+
+  customers:
+    not_null:  [customer_id, segment_id, gender]
+    unique:    [customer_id]
+    regex:
+      email: '^[^@\s]+@[^@\s]+\.[^@\s]+$'
+      phone: '^01[0-25][0-9]{8}$'
+    foreign_keys:
+      region_id:  regions.region_id
+      segment_id: segments.segment_id
+
+  drivers:
+    not_null: [driver_id, driver_name, shift, vehicle_type, region_id]
+    unique:   [driver_id]
+    range:
+      rating_avg:   [1.0, 5.0]
+      on_time_rate: [0.0, 1.0]
+      cancel_rate:  [0.0, 1.0]
+    allowed_values:
+      shift:        [morning, evening, night]
+      vehicle_type: [bike, motorbike, car]
+    regex:
+      driver_phone: '^01[0-25][0-9]{8}$'
+    foreign_keys:
+      region_id: regions.region_id
+
+  restaurants:
+    not_null: [restaurant_id, region_id, category_id, price_tier]
+    unique:   [restaurant_id]
+    range:
+      rating_avg: [1.0, 5.0]
+    allowed_values:
+      price_tier: [Low, Mid, High]
+    foreign_keys:
+      region_id:   regions.region_id
+      category_id: categories.category_id
+
+  agents:
+    not_null: [agent_id, agent_name, skill_level, team_id]
+    unique:   [agent_id]
+    allowed_values:
+      skill_level: [Junior, Mid, Senior, Lead]
+    foreign_keys:
+      team_id: teams.team_id
+
+  orders:
+    not_null: [order_id, customer_id, restaurant_id, driver_id, region_id, order_status, payment_method]
+    unique:   [order_id]
+    range:
+      order_amount:    [0.01, 10000]
+      delivery_fee:    [0.0,  500]
+      discount_amount: [0.0,  500]
+      total_amount:    [0.01, 10000]
+    allowed_values:
+      order_status:   [Delivered, Cancelled, Refunded]
+      payment_method: [card, cash, wallet]
+    foreign_keys:
+      customer_id:   customers.customer_id
+      restaurant_id: restaurants.restaurant_id
+      driver_id:     drivers.driver_id
+      region_id:     regions.region_id
+
+  tickets:
+    not_null: [ticket_id, order_id, customer_id, agent_id, reason_id, priority_id, channel_id, status]
+    unique:   [ticket_id]
+    allowed_values:
+      status: [Open, InProgress, Resolved, Closed, Reopened]
+    range:
+      refund_amount: [0.0, 10000]
+    foreign_keys:
+      order_id:    orders.order_id
+      customer_id: customers.customer_id
+      agent_id:    agents.agent_id
+      reason_id:   reasons.reason_id
+      priority_id: priorities.priority_id
+      channel_id:  channels.channel_id
+
+  ticket_events:
+    not_null: [event_id, ticket_id, agent_id, event_ts, new_status]
+    unique:   [event_id]
+    allowed_values:
+      new_status: [Open, InProgress, Resolved, Closed, Reopened]
+    foreign_keys:
+      ticket_id: tickets.ticket_id
+      agent_id:  agents.agent_id
+
+# ─────────────────────────────────────────
+# ORPHAN HANDLING
+# ─────────────────────────────────────────
+orphan_handling:
+  strategy: quarantine          # quarantine | enrich | drop
+  quarantine_schema: audit
+  quarantine_table_prefix: orphan_
+  enrich_from_master: true
+  master_lookup_tables:
+    - customers
+    - drivers
+    - restaurants
+
+# ─────────────────────────────────────────
+# SLA CONFIG
+# ─────────────────────────────────────────
+sla:
+  first_response_minutes: 1
+  resolution_minutes:     15
+
+# ─────────────────────────────────────────
+# WAREHOUSE — DIMENSIONAL MODEL
+# ─────────────────────────────────────────
+warehouse:
+  dim_tables:
+    - dim_customers
+    - dim_drivers
+    - dim_restaurants
+    - dim_agents
+    - dim_regions
+    - dim_date
+    - dim_time
+  fact_tables:
+    - fact_orders
+    - fact_tickets
+    - fact_ticket_events
+  scd_type:             2
+  surrogate_key_prefix: sk_
+
+# ─────────────────────────────────────────
+# OBSERVABILITY & LOGGING
+# ─────────────────────────────────────────
+observability:
+  log_level:        INFO
+  log_format:       "%(asctime)s [%(levelname)s] %(name)s — %(message)s"
+  log_to_file:      true
+  log_filename:     logs/pipeline.log
+  log_rotation:     daily
+  log_backup_count: 7
+
+  metrics:
+    track_row_counts:       true
+    track_null_rates:       true
+    track_duplicate_rates:  true
+    track_orphan_rates:     true
+    track_sla_breach_rates: true
+    track_run_duration:     true
+
+# ─────────────────────────────────────────
+# FILE TRACKER
+# ─────────────────────────────────────────
+file_tracker:
+  db_path:       observability/file_tracker.duckdb
+  table:         processed_files
+  retry_failed:  true
+  max_retries:   3
