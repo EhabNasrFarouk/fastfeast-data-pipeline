@@ -5,19 +5,17 @@ import hashlib
 import duckdb
 from datetime import datetime
 
-DB_PATH = "warehouse/fastfeast.duckdb"
-PIPELINE_VERSION = "0.1.0"  # bump manually or wire to git commit hash
+from config.config_loader import load_config
 
-
-def _ensure_db_dir():
-    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-
+def get_db_path() -> str:
+    return load_config()["file_tracker"]["db_path"]  
 
 def get_connection():
-    """Return a DuckDB connection to the warehouse database."""
-    _ensure_db_dir()
-    return duckdb.connect(DB_PATH)
+    db_path = get_db_path()
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    return duckdb.connect(db_path)
 
+PIPELINE_VERSION = load_config()["project"]["version"]  
 
 def init_tracker_table(con=None):
     """Create the file-tracking table if it doesn't exist."""

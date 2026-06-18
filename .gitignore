@@ -3,3 +3,6 @@ __pycache__/
 *.duckdb
 .env
 warehouse/_exports/
+*__init__*
+*gitignore*
+data/input/batch/*
