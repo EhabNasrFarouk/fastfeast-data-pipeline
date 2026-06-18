@@ -1,21 +1,21 @@
 # ingestion/batch/batch_ingestion.py
 import os
 from datetime import datetime
+from config.config_loader import load_config
 from ingestion.file_tracker import (
     get_connection, init_tracker_table, new_run_id,
     get_unprocessed_files, start_file_tracking, mark_processed
 )
 
-SUPPORTED_EXTENSIONS = {".csv", ".json"}
 
 
-def get_batch_files(batch_path: str) -> list:
+def get_batch_files(batch_path: str,extensions) -> list:
     if not os.path.exists(batch_path):
         print(f"[BATCH] Folder not found: {batch_path}")
         return []
     return [
         os.path.join(batch_path, f) for f in os.listdir(batch_path)
-        if os.path.splitext(f)[1] in SUPPORTED_EXTENSIONS
+        if os.path.splitext(f)[1] in extensions
     ]
 
 
@@ -63,17 +63,20 @@ def process_file(filepath, run_id, run_date, con):
         return "failed", 0, 0, 0, str(e)
 
 
-def run_batch_pipeline():
+def run_batch_pipeline(config=None):
+    config = config or load_config()
     batch_date = datetime.today().strftime("%Y-%m-%d")
-    batch_path = f"data/input/batch/{batch_date}/"
-
+    batch_dir = config["Ingestion"]["Batch"]
+    date_format = config["batch"]["date_format"]
+    extensions = set(config["batch"]["supported_extensions"].values())
+    batch_path = os.path.join(batch_dir, batch_date)
     run_id = new_run_id()
     print(f"[BATCH] Run {run_id} — pipeline for {batch_date}")
 
     con = get_connection()
     init_tracker_table(con)
 
-    files = get_batch_files(batch_path)
+    files = get_batch_files(batch_path,extensions)
     new_files = get_unprocessed_files(files, run_date=batch_date, con=con)
 
     if not new_files:

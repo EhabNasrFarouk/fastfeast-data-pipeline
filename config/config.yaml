@@ -11,10 +11,13 @@ project:
 # ─────────────────────────────────────────
 # PATHS
 # ─────────────────────────────────────────
+
+Ingestion:
+  Batch: data/input/batch
+  Stream: data/input/stream
+  Master: data/master
+
 paths:
-  master_dir:        data/master
-  batch_dir:         data/input/batch
-  stream_dir:        data/input/stream
   output_dir:        data/output
   warehouse_dir:     warehouse
   observability_dir: observability
@@ -84,6 +87,11 @@ batch:
       rating_avg:       float
       prep_time_avg_min: int
 
+  date_format: "%Y-%m-%d"
+
+  supported_extensions:
+    csv:  .csv
+    json: .json
 # ─────────────────────────────────────────
 # STREAM / MICRO-BATCH INGESTION
 # ─────────────────────────────────────────
@@ -260,3 +268,8 @@ file_tracker:
   table:         processed_files
   retry_failed:  true
   max_retries:   3
+
+cron:
+  day_of_week: thu
+  hour:        15
+  minute:      49
