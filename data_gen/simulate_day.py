@@ -9,12 +9,30 @@ Usage:
 """
 
 import os
+from pathlib import Path
 import sys
 import random
 import argparse
 import subprocess
 from datetime import datetime
 
+
+# -------------------------- Handling Paths --------------------------
+root = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(root))
+from config.config_loader import load_config
+
+data = load_config()
+
+MASTER_DIR = root / data["Ingestion"]["Master"]
+
+generate_master_data_dir = str(root / "data_gen/generate_master_data.py")
+generate_batch_data_dir = str(root / "data_gen/generate_batch_data.py")
+generate_stream_data_dir = str(root / "data_gen/generate_stream_data.py")
+
+add_new_customers_dir = str(root / "data_gen/add_new_customers.py")
+add_new_drivers_dir = str(root / "data_gen/add_new_drivers.py")
+# --------------------------------------------------------------------
 
 def run_command(cmd, description, verbose=False):
     """Run a command and handle output."""
@@ -40,7 +58,9 @@ def run_command(cmd, description, verbose=False):
 
 def check_master_data():
     """Check if master data exists."""
-    return os.path.exists("data/master/metadata.json")
+    metadata_path = f"{MASTER_DIR}/metadata.json"
+
+    return os.path.exists(metadata_path)
 
 
 def main():
@@ -86,19 +106,19 @@ def main():
     # Step 0: Generate master data if needed
     if not check_master_data():
         print("\n[INFO] Master data not found. Generating...")
-        if not run_command(["python", "generate_master_data.py"], 
+        if not run_command(["python", generate_master_data_dir], 
                           "Generate master data", verbose):
             return 1
     elif not args.skip_master:
         print("\n[INFO] Master data exists. Regenerating for fresh start...")
-        if not run_command(["python", "generate_master_data.py"], 
+        if not run_command(["python", generate_master_data_dir], 
                           "Regenerate master data", verbose):
             return 1
     else:
         print("\n[INFO] Using existing master data (--skip-master)")
     
     # Step 1: Generate batch data (morning snapshot)
-    if not run_command(["python", "generate_batch_data.py", "--date", run_date],
+    if not run_command(["python", generate_batch_data_dir, "--date", run_date],
                       f"Generate batch data for {run_date}", verbose):
         return 1
     
@@ -109,7 +129,7 @@ def main():
         # Before some hours, add new customers/drivers (creating orphan potential)
         if random.random() < 0.6:  # 60% chance before each hour
             new_customers = random.randint(2, 8)
-            if not run_command(["python", "add_new_customers.py", "--count", str(new_customers)],
+            if not run_command(["python", add_new_customers_dir, "--count", str(new_customers)],
                               f"Add {new_customers} new customers (before hour {hour})", verbose):
                 return 1
             stats["customers_added"] += new_customers
@@ -117,14 +137,14 @@ def main():
         
         if random.random() < 0.4:  # 40% chance for drivers
             new_drivers = random.randint(1, 4)
-            if not run_command(["python", "add_new_drivers.py", "--count", str(new_drivers)],
+            if not run_command(["python", add_new_drivers_dir, "--count", str(new_drivers)],
                               f"Add {new_drivers} new drivers (before hour {hour})", verbose):
                 return 1
             stats["drivers_added"] += new_drivers
             stats["orphan_opportunities"].append(f"Drivers before hour {hour}")
         
         # Generate stream data for this hour
-        if not run_command(["python", "generate_stream_data.py", "--date", run_date, "--hour", str(hour)],
+        if not run_command(["python", generate_stream_data_dir, "--date", run_date, "--hour", str(hour)],
                           f"Generate stream data for hour {hour:02d}", verbose):
             return 1
         stats["hours_generated"] += 1

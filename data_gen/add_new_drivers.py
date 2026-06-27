@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import random
 import yaml
@@ -9,13 +10,14 @@ from pathlib import Path
 
 # -------------------------- Handling Paths --------------------------
 root = Path(__file__).resolve().parent.parent
-config_path = root / 'config/config.yaml'
+sys.path.insert(0, str(root))
+from config.config_loader import load_config
 
-with open(config_path, 'r') as file:
-    data = yaml.safe_load(file)
+data = load_config()
 
 MASTER_DIR = root / data["Ingestion"]["Master"]
 # --------------------------------------------------------------------
+
 
 FIRST_NAMES_MALE = [
     "Ahmed", "Mohamed", "Omar", "Youssef", "Ali", "Hassan", "Hussein", "Mahmoud",

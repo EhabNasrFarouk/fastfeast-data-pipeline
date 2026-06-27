@@ -1,6 +1,7 @@
 import os
 import json
 import yaml
+import sys
 import random
 import argparse
 import pandas as pd
@@ -9,13 +10,20 @@ from pathlib import Path
 
 # -------------------------- Handling Paths --------------------------
 root = Path(__file__).resolve().parent.parent
-config_path = root / 'config/config.yaml'
+sys.path.insert(0, str(root))
+from config.config_loader import load_config
 
-with open(config_path, 'r') as file:
-    data = yaml.safe_load(file)
+data = load_config()
 
 MASTER_DIR = root / data["Ingestion"]["Master"]
 BATCH_DIR = root / data["Ingestion"]["Batch"]
+
+# print(f"root: {root}")
+# print("-" * 30)
+# print(f"Batch: {BATCH_DIR}")
+# print("-" * 30)
+# print(f"Master: {MASTER_DIR}")
+# print("-" * 30)
 # --------------------------------------------------------------------
 
 def load_master_data():
