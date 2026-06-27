@@ -3,7 +3,7 @@ from watchdog.events import FileSystemEventHandler
 from pathlib import Path
 import time
 import os
-import yaml
+import sys
 
 
 class Handler(FileSystemEventHandler):
@@ -53,11 +53,10 @@ class Handler(FileSystemEventHandler):
 # to:
 # project_root/
 root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(root))
+from config.config_loader import load_config
 
-config_path = root / "config" / "config.yaml"
-
-with open(config_path, "r", encoding="utf-8") as file:
-    data = yaml.safe_load(file)
+data = load_config()
 
 # Directory that will be monitored for incoming files.
 STREAM_DIR = root / data["Ingestion"]["Stream"]

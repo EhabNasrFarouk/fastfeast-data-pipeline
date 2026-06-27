@@ -11,6 +11,7 @@ Usage:
 """
 
 import os
+import sys
 import random
 import yaml
 import pandas as pd
@@ -22,13 +23,15 @@ random.seed(SEED)
 
 # -------------------------- Handling Paths --------------------------
 root = Path(__file__).resolve().parent.parent
-config_path = root / 'config/config.yaml'
+sys.path.insert(0, str(root))
+from config.config_loader import load_config
 
-with open(config_path, 'r') as file:
-    data = yaml.safe_load(file)
+data = load_config()
 
 MASTER_DIR = root / data["Ingestion"]["Master"]
 # --------------------------------------------------------------------
+
+
 os.makedirs(MASTER_DIR, exist_ok=True)
 
 # Initial counts - these will grow as new customers/drivers are added
