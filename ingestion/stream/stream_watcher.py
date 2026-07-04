@@ -65,23 +65,24 @@ STREAM_DIR = root / data["Ingestion"]["Stream"]
 # Configure and start the watchdog observer
 # --------------------------------------------------------------------
 
-obs = Observer()
+def run_stream_watcher():
+    obs = Observer()
 
-obs.schedule(
-    Handler(),
-    path=STREAM_DIR,
-    recursive=True
-)
+    obs.schedule(
+        Handler(),
+        path=STREAM_DIR,
+        recursive=True
+    )
 
-obs.start()
+    obs.start()
 
-try:
-    # Keep the main thread alive while the observer runs in the background.
-    while True:
-        time.sleep(5)
+    try:
+        # Keep the main thread alive while the observer runs in the background.
+        while True:
+            time.sleep(5)
 
-except KeyboardInterrupt:
-    # Gracefully stop monitoring when the application is terminated.
-    obs.stop()
+    except KeyboardInterrupt:
+        # Gracefully stop monitoring when the application is terminated.
+        obs.stop()
 
-obs.join()
+    obs.join()
