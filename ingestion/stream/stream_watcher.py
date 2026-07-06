@@ -1,5 +1,6 @@
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+from thread_pool import PipelineManager
 from pathlib import Path
 import time
 import os
@@ -15,9 +16,10 @@ class Handler(FileSystemEventHandler):
     for downstream processing.
     """
 
-    def __init__(self):
+    def __init__(self, pipeline_mng: PipelineManager):
         """Store the last processed folder to avoid duplicate processing."""
         self.last_path = None
+        self.pipeline_mng = pipeline_mng
 
     def on_created(self, event):
         """
@@ -38,9 +40,11 @@ class Handler(FileSystemEventHandler):
                 time.sleep(1)
                 file_count_after = len(os.listdir(src_path))
 
+                # self.pipeline_mng.submit_file(src_path, "stream")
                 if file_count_before == file_count_after:
                     print(f"New Folder Created: {src_path}")
                     print("-" * 30)
+                    self.pipeline_mng.submit_file(src_path, "stream")
                     break
 
 
@@ -65,11 +69,11 @@ STREAM_DIR = root / data["Ingestion"]["Stream"]
 # Configure and start the watchdog observer
 # --------------------------------------------------------------------
 
-def run_stream_watcher():
+def run_stream_watcher(pipeline_mng: PipelineManager):
     obs = Observer()
 
     obs.schedule(
-        Handler(),
+        Handler(pipeline_mng),
         path=STREAM_DIR,
         recursive=True
     )
@@ -80,6 +84,7 @@ def run_stream_watcher():
         # Keep the main thread alive while the observer runs in the background.
         while True:
             time.sleep(5)
+            # print("Hello from streaaaaaaaaaaaaaaaam!")
 
     except KeyboardInterrupt:
         # Gracefully stop monitoring when the application is terminated.
