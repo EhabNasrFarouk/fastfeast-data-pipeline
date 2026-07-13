@@ -21,12 +21,12 @@ class Handler(FileSystemEventHandler):
         self.last_path = None
         self.pipeline_mng = pipeline_mng
 
-    def take_action(path):
-        date_info = path.parts
-        hour = date_info[-2:][1]
-        date = date.fromisoformat(date_info[-2:][0])
-        print(f"date: {date}   hour: {hour}")
-        print("-" * 30)
+    # def take_action(path):
+    #     date_info = path.parts
+    #     hour = date_info[-2:][1]
+    #     date = date.fromisoformat(date_info[-2:][0])
+    #     print(f"date: {date}   hour: {hour}")
+    #     print("-" * 30)
 
     def on_created(self, event):
         """
