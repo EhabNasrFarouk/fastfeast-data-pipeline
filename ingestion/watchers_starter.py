@@ -1,8 +1,8 @@
 import threading
 import time
-from stream.stream_watcher import run_stream_watcher
-from thread_pool import PipelineManager
-# from batch.batch_ingestion import run_batch_pipeline
+from ingestion.stream.stream_watcher import run_stream_watcher
+from ingestion.thread_pool import PipelineManager
+from ingestion.batch.scheduler import run_batch_watcher
 
 
 pipeline_mng = PipelineManager()
@@ -10,7 +10,7 @@ pipeline_mng = PipelineManager()
 stop_event = threading.Event()
 threads = [
     threading.Thread(target=run_stream_watcher, args=(pipeline_mng,), name="Stream Watcher", daemon=True),
-    # threading.Thread(target=run_batch_pipeline, name="Batch Watcher", daemon=True)
+    threading.Thread(target=run_batch_watcher, args=(pipeline_mng,), name="Batch Watcher", daemon=True)
 ]
 
 for t in threads:

@@ -7,7 +7,7 @@ from ingestion.file_tracker import (
     get_unprocessed_files, start_file_tracking, mark_processed
 )
 
-
+from ingestion.pipeline import process_file
 
 def get_batch_files(batch_path: str,extensions) -> list:
     if not os.path.exists(batch_path):
@@ -24,7 +24,7 @@ def infer_source_table(filepath: str) -> str:
     return os.path.splitext(os.path.basename(filepath))[0]
 
 
-def process_file(filepath, run_id, run_date, con):
+def process_files(filepath, run_id, run_date, con):
     """
     Process a single batch file. Returns (status, rows_read, rows_inserted, rows_rejected, error_message).
     Replace the body with real load/transform logic.
@@ -63,45 +63,48 @@ def process_file(filepath, run_id, run_date, con):
         return "failed", 0, 0, 0, str(e)
 
 
-def run_batch_pipeline(config=None):
+def run_batch_pipeline(pipeline_mng, config=None):
+
+      
     config = config or load_config()
     batch_date = datetime.today().strftime("%Y-%m-%d")
     batch_dir = config["Ingestion"]["Batch"]
     date_format = config["batch"]["date_format"]
     extensions = set(config["batch"]["supported_extensions"].values())
     batch_path = os.path.join(batch_dir, batch_date)
-    run_id = new_run_id()
-    print(f"[BATCH] Run {run_id} — pipeline for {batch_date}")
+    # run_id = new_run_id()
+    # print(f"[BATCH] Run {run_id} — pipeline for {batch_date}")
 
-    con = get_connection()
-    init_tracker_table(con)
+    # con = get_connection()
+    # init_tracker_table(con)
 
     files = get_batch_files(batch_path,extensions)
-    new_files = get_unprocessed_files(files, run_date=batch_date, con=con)
+    process_file(files,"Batch")  
+    # new_files = get_unprocessed_files(files, run_date=batch_date, con=con)
 
-    if not new_files:
-        print("[BATCH] No new or changed files to process.")
-        con.close()
-        return
+    # if not new_files:
+    #     print("[BATCH] No new or changed files to process.")
+    #     con.close()
+    #     return
 
-    succeeded, failed = 0, 0
+    # succeeded, failed = 0, 0
 
-    for f in new_files:
-        print(f"[BATCH] Processing → {f}")
-        status, rows_read, rows_inserted, rows_rejected, err = process_file(
-            f, run_id=run_id, run_date=batch_date, con=con
-        )
+    # for f in new_files:
+    #     print(f"[BATCH] Processing → {f}")
+    #     status, rows_read, rows_inserted, rows_rejected, err = process_file(
+    #         f, run_id=run_id, run_date=batch_date, con=con
+    #     )
 
-        if status == "success":
-            succeeded += 1
-            print(f"[BATCH]   OK  rows_read={rows_read} inserted={rows_inserted} rejected={rows_rejected}")
-        else:
-            failed += 1
-            print(f"[BATCH]   FAILED → {err}")
+    #     if status == "success":
+    #         succeeded += 1
+    #         print(f"[BATCH]   OK  rows_read={rows_read} inserted={rows_inserted} rejected={rows_rejected}")
+    #     else:
+    #         failed += 1
+    #         print(f"[BATCH]   FAILED → {err}")
 
-    con.close()
+    # con.close()
 
-    print(f"[BATCH] Run {run_id} done. {succeeded} succeeded, {failed} failed (of {len(new_files)}).")
+    # print(f"[BATCH] Run {run_id} done. {succeeded} succeeded, {failed} failed (of {len(new_files)}).")
 
 
 if __name__ == "__main__":

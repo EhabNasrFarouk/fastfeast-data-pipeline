@@ -44,11 +44,6 @@ database:
 # BATCH INGESTION
 # ─────────────────────────────────────────
 batch:
-  schedule:
-    day_of_week: thu
-    hour:        8
-    minute:      0
-
   csv_tables:
     - customers
     - drivers
@@ -270,6 +265,6 @@ file_tracker:
   max_retries:   3
 
 cron:
-  day_of_week: thu
-  hour:        15
-  minute:      49
+  day_of_week: fri
+  hour:        6
+  minute:      25

@@ -1,6 +1,6 @@
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-from thread_pool import PipelineManager
+from ingestion.thread_pool import PipelineManager
 from pathlib import Path
 import time
 import os
