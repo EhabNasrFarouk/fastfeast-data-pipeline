@@ -3,12 +3,16 @@ import os
 import uuid
 import hashlib
 import duckdb
+import sys
+from pathlib import Path
 from datetime import datetime
 
+root = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(root))
 from config.config_loader import load_config
 
 def get_db_path() -> str:
-    return load_config()["file_tracker"]["db_path"]  
+    return load_config()["database"]["duckdb"]["path"]
 
 def get_connection():
     db_path = get_db_path()

@@ -1,5 +1,11 @@
 import threading
 import time
+import sys
+from pathlib import Path
+
+
+root = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(root))
 from ingestion.stream.stream_watcher import run_stream_watcher
 from ingestion.thread_pool import PipelineManager
 from ingestion.batch.scheduler import run_batch_watcher
@@ -18,7 +24,7 @@ for t in threads:
 
 try:
     while True:
-        print("Hello from main program!")
+        # print("Hello from main program!")
         for t in threads:
             if not t.is_alive():
                 print(f"{t.name} has crashed, now the the pipeline will stop.")

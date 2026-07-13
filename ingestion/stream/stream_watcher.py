@@ -1,6 +1,6 @@
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-from ingestion.thread_pool import PipelineManager
+from datetime import date
 from pathlib import Path
 import time
 import os
@@ -21,6 +21,13 @@ class Handler(FileSystemEventHandler):
         self.last_path = None
         self.pipeline_mng = pipeline_mng
 
+    def take_action(path):
+        date_info = path.parts
+        hour = date_info[-2:][1]
+        date = date.fromisoformat(date_info[-2:][0])
+        print(f"date: {date}   hour: {hour}")
+        print("-" * 30)
+
     def on_created(self, event):
         """
         Triggered whenever a file or directory is created.
@@ -40,11 +47,29 @@ class Handler(FileSystemEventHandler):
                 time.sleep(1)
                 file_count_after = len(os.listdir(src_path))
 
-                # self.pipeline_mng.submit_file(src_path, "stream")
                 if file_count_before == file_count_after:
-                    print(f"New Folder Created: {src_path}")
-                    print("-" * 30)
-                    self.pipeline_mng.submit_file(src_path, "stream")
+                    # ------------------ Testing ------------------
+                    # print("-" * 30)
+                    # print(f"New Folder Created: {src_path}")
+                    date_info = src_path.parts
+                    hour = date_info[-2:][1]
+                    day = date.fromisoformat(date_info[-2:][0])
+                    # print(f"date: {date}   hour: {hour}")
+                    # print("-" * 30)
+
+                    # ------------------ Actions ------------------
+                    # Generating run_id.
+                    run_id = new_run_id()
+
+                    # Getting unprocessed files.
+                    files_paths = [ os.path.join(src_path, f) for f in os.listdir(src_path) ]
+                    stream_files = get_unprocessed_files(files_paths, day, hour)
+
+                    # Passing the files to the thread pool.
+                    for f in stream_files:
+                        self.pipeline_mng.submit_file(run_id, f, "stream", day, hour)
+
+
                     break
 
 
@@ -59,6 +84,9 @@ class Handler(FileSystemEventHandler):
 root = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(root))
 from config.config_loader import load_config
+from ingestion.thread_pool import PipelineManager
+from ingestion.file_tracker import get_unprocessed_files, new_run_id
+
 
 data = load_config()
 

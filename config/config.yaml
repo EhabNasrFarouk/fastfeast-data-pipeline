@@ -259,7 +259,7 @@ observability:
 # FILE TRACKER
 # ─────────────────────────────────────────
 file_tracker:
-  db_path:       observability/file_tracker.duckdb
+  db_path:       warehouse/file_tracker.duckdb
   table:         processed_files
   retry_failed:  true
   max_retries:   3
