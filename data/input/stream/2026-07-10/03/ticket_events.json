@@ -1,0 +1,29 @@
+[
+  {
+    "event_id": "dc8e771d-917d-4d76-bd13-012e90aa9769",
+    "ticket_id": "eb6b0adc-7683-4bc8-b147-9cad5652e48d",
+    "agent_id": 10,
+    "event_ts": "2026-07-10 04:14:00",
+    "old_status": NaN,
+    "new_status": "Open",
+    "notes": "Ticket created"
+  },
+  {
+    "event_id": "4c78e7e8-d449-49d1-ab1d-3497ae893150",
+    "ticket_id": "eb6b0adc-7683-4bc8-b147-9cad5652e48d",
+    "agent_id": 10,
+    "event_ts": "2026-07-10 04:14:27",
+    "old_status": "Open",
+    "new_status": "InProgress",
+    "notes": "Agent responded"
+  },
+  {
+    "event_id": "2a08036a-6aaa-4c66-966a-b7bf1bc7ae21",
+    "ticket_id": "eb6b0adc-7683-4bc8-b147-9cad5652e48d",
+    "agent_id": 10,
+    "event_ts": "2026-07-10 04:27:00",
+    "old_status": "InProgress",
+    "new_status": "Resolved",
+    "notes": "Ticket resolved"
+  }
+]

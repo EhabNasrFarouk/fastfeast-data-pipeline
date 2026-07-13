@@ -1,5 +1,5 @@
 import concurrent.futures
-from pipeline import process_file
+from ingestion.pipeline import process_file
 
 class PipelineManager:
     def __init__(self, max_workers=5):

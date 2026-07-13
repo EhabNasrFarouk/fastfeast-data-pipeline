@@ -1,28 +1,36 @@
-# main.py
 import time
+from pathlib import Path
+import sys
 from apscheduler.schedulers.background import BackgroundScheduler
-from ingestion.batch.batch_ingestion import run_batch_pipeline 
+from ingestion.batch.batch_ingestion import run_batch_pipeline
 from config.config_loader import load_config
 
+
+
+root = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(root))
 config = load_config()
 
-if __name__ == "__main__":
-
-    # 1. Batch Scheduler
+def run_batch_watcher(pipeline_mng):
     scheduler = BackgroundScheduler()
-    scheduler.add_job(run_batch_pipeline,trigger="cron",day_of_week=config["cron"]["day_of_week"],hour=config["cron"]["hour"],minute=config["cron"]["minute"])
+
+    scheduler.add_job(
+        run_batch_pipeline,
+        args=[pipeline_mng],
+        trigger="cron",
+        day_of_week=config["cron"]["day_of_week"],
+        hour=config["cron"]["hour"],
+        minute=config["cron"]["minute"],
+    )
+
     scheduler.start()
-    print("[MAIN] Batch scheduler started")
+    print("[BATCH] Batch scheduler started")
 
-    # 2. Keep Alive
-    print("[MAIN] Pipeline running — press Ctrl+C to stop")
     try:
+        # Keep the main thread alive while the scheduler runs in the background.
         while True:
-            time.sleep(1)
+            time.sleep(5)
+
     except KeyboardInterrupt:
-        print("\n[MAIN] Shutting down...")
-        scheduler.shutdown()
-        print("[MAIN] Done.")
-
-
-        
+        # Gracefully stop the scheduler when the application is terminated.
+        scheduler.shutdown()        
