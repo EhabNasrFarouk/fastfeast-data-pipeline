@@ -12,7 +12,7 @@ class PipelineManager:
         # The executor automatically manages the queue and the threads
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=max_workers)
         
-    def submit_file(self, run_id: str, file_path: str, file_type: str, run_date: date, run_hour: int):
+    def submit_file(self, run_id: str, file_path: str, file_type: str, run_date: date, run_hour: int = None):
         """Watchers call this to hand off a file to the pool."""
         # submit() puts the function and its arguments into the internal queue
         # and a free thread will pick it up automatically.

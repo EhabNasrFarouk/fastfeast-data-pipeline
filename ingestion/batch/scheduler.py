@@ -2,7 +2,7 @@ import time
 from pathlib import Path
 import sys
 from apscheduler.schedulers.background import BackgroundScheduler
-from ingestion.batch.batch_ingestion import run_batch_pipeline
+from ingestion.batch.batch_ingestion import batch_ingest
 from config.config_loader import load_config
 
 
@@ -15,7 +15,7 @@ def run_batch_watcher(pipeline_mng):
     scheduler = BackgroundScheduler()
 
     scheduler.add_job(
-        run_batch_pipeline,
+        batch_ingest,
         args=[pipeline_mng],
         trigger="cron",
         day_of_week=config["cron"]["day_of_week"],
