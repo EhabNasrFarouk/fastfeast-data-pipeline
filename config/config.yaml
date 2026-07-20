@@ -113,35 +113,83 @@ stream:
 validation:
 
   customers:
-    not_null:  [customer_id, segment_id, gender]
+    not_null:  [customer_id, segment_id, phone, gender, region_id, signup_date]
+
+    data_types:
+      customer_id:  INT
+      full_name:  VARCHAR(100)
+      email:  VARCHAR(100)
+      phone:  VARCHAR(15)
+      region_id:  INT
+      segment_id: INT
+      signup_date:  DATE
+      gender: ENUM('male','female')
+      created_at: TIMESTAMP
+      updated_at: TIMESTAMP
+
     unique:    [customer_id]
     regex:
       email: '^[^@\s]+@[^@\s]+\.[^@\s]+$'
       phone: '^01[0-25][0-9]{8}$'
+
     foreign_keys:
       region_id:  regions.region_id
       segment_id: segments.segment_id
 
   drivers:
-    not_null: [driver_id, driver_name, shift, vehicle_type, region_id]
-    unique:   [driver_id]
+    not_null: [driver_id, shift, vehicle_type, region_id, national_id, hire_date, rating_avg, on_time_rate, cancel_rate, completed_deliveries, is_active]
+
+    data_types:
+      driver_id:  INT
+      driver_name:  VARCHAR(100)
+      driver_phone: VARCHAR(15)
+      national_id:  VARCHAR(14)
+      region_id:  INT
+      shift:  VARCHAR(10)
+      vehicle_type: VARCHAR(15)
+      hire_date:  DATE
+      rating_avg: DECIMAL(3,2)
+      on_time_rate: DECIMAL(3,2)
+      cancel_rate:  DECIMAL(3,2)
+      completed_deliveries: INT
+      is_active:  BOOLEAN
+      created_at: TIMESTAMP
+      updated_at: TIMESTAMP
+
+    unique:   [driver_id, national_id]
     range:
       rating_avg:   [1.0, 5.0]
       on_time_rate: [0.0, 1.0]
       cancel_rate:  [0.0, 1.0]
+      completed_deliveries: [0, INF]
     allowed_values:
       shift:        [morning, evening, night]
       vehicle_type: [bike, motorbike, car]
     regex:
       driver_phone: '^01[0-25][0-9]{8}$'
+      national_id: '^[2-3][0-9]{13}$'
     foreign_keys:
       region_id: regions.region_id
 
   restaurants:
-    not_null: [restaurant_id, region_id, category_id, price_tier]
+    not_null: [restaurant_id, restaurant_name, region_id, category_id, price_tier, is_active, rating_avg, prep_time_avg_min]
+
+    data_types:
+      restaurant_id:  INT
+      restaurant_name:  VARCHAR(100)
+      region_id:  INT
+      category_id:  INT
+      price_tier: VARCHAR(10)
+      rating_avg: DECIMAL(3,2)
+      prep_time_avg_min:  INT
+      is_active:  BOOLEAN
+      created_at: TIMESTAMP
+      updated_at: TIMESTAMP
+
     unique:   [restaurant_id]
     range:
       rating_avg: [1.0, 5.0]
+      prep_time_avg_min: [0, INF]
     allowed_values:
       price_tier: [Low, Mid, High]
     foreign_keys:
@@ -149,15 +197,59 @@ validation:
       category_id: categories.category_id
 
   agents:
-    not_null: [agent_id, agent_name, skill_level, team_id]
+    not_null: [agent_id, agent_phone, skill_level, team_id, is_active, hire_date, avg_handle_time_min, resolution_rate, csat_score]
+    
+    data_types:
+      agent_id: INT	
+      agent_name: VARCHAR(100)
+      agent_email:  VARCHAR(100)
+      agent_phone:  VARCHAR(15)
+      team_id:  INT
+      skill_level:  VARCHAR(10)
+      hire_date:  DATE
+      avg_handle_time_min:  INT
+      resolution_rate:  DECIMAL(3, 2)
+      csat_score: DECIMAL(3, 2)
+      is_active:  BOOLEAN
+      created_at: TIMESTAMP
+      updated_at: TIMESTAMP
+
+
     unique:   [agent_id]
+
+    range:
+      avg_handle_time_min: [0, INF]
+      resolution_rate: [0.0, 1.0]
+      csat_score: [0.0, 5.0]
+
     allowed_values:
       skill_level: [Junior, Mid, Senior, Lead]
+
+    regex:
+      agent_email: '^[^@\s]+@[^@\s]+\.[^@\s]+$'
+      agent_phone: '^[0-9]{10}$' # It starts with 1
+
     foreign_keys:
       team_id: teams.team_id
 
   orders:
-    not_null: [order_id, customer_id, restaurant_id, driver_id, region_id, order_status, payment_method]
+    not_null: [order_id, customer_id, restaurant_id, driver_id, region_id, order_status, payment_method, order_amount, delivery_fee, discount_amount, total_amount, order_created_at, delivered_at]
+    
+    data_types:
+      order_id: VARCHAR(36)
+      customer_id: INT
+      restaurant_id: INT
+      driver_id: INT
+      region_id: INT
+      order_amount: DECIMAL(10,2)
+      delivery_fee: DECIMAL(10,2)
+      discount_amount: DECIMAL(10,2)
+      total_amount: DECIMAL(10,2)
+      order_status: VARCHAR(20)
+      payment_method: VARCHAR(10)
+      order_created_at: TIMESTAMP
+      delivered_at: TIMESTAMP
+    
     unique:   [order_id]
     range:
       order_amount:    [0.01, 10000]
@@ -174,7 +266,26 @@ validation:
       region_id:     regions.region_id
 
   tickets:
-    not_null: [ticket_id, order_id, customer_id, agent_id, reason_id, priority_id, channel_id, status]
+    not_null: [ticket_id, order_id, customer_id, agent_id, reason_id, priority_id, channel_id, status, created_at]
+    
+    data_types:
+      ticket_id: VARCHAR(36)  
+      order_id: VARCHAR(36)   
+      customer_id: INT  
+      driver_id: INT
+      restaurant_id: INT
+      agent_id: INT
+      reason_id: INT
+      priority_id: INT
+      channel_id: INT
+      status: VARCHAR(20)
+      refund_amount: DECIMAL(10,2)
+      created_at: TIMESTAMP
+      first_response_at: TIMESTAMP
+      resolved_at: TIMESTAMP
+      sla_first_due_at: TIMESTAMP
+      sla_resolve_due_at: TIMESTAMP
+    
     unique:   [ticket_id]
     allowed_values:
       status: [Open, InProgress, Resolved, Closed, Reopened]
@@ -190,12 +301,112 @@ validation:
 
   ticket_events:
     not_null: [event_id, ticket_id, agent_id, event_ts, new_status]
-    unique:   [event_id]
+    
+    data_types:
+      event_id: VARCHAR(36)  
+      ticket_id: VARCHAR(36)  
+      agent_id: INT
+      event_ts: TIMESTAMP
+      old_status: VARCHAR(20)
+      new_status: VARCHAR(20)
+      notes: TEXT
+    
+    unique: [event_id]
     allowed_values:
       new_status: [Open, InProgress, Resolved, Closed, Reopened]
     foreign_keys:
       ticket_id: tickets.ticket_id
       agent_id:  agents.agent_id
+
+  cities:
+    not_null: [city_id, city_name, country, timezone]
+    unique: [city_id]
+    data_types:
+      city_id:  INT
+      city_name:  VARCHAR(50)
+      country:  VARCHAR(50)
+      timezone: VARCHAR(50)
+      
+  regions:
+    not_null: [region_id, region_name, city_id, delivery_base_fee]
+    unique: [region_id]
+    data_types:
+      region_id: INT
+      region_name: VARCHAR(50)
+      city_id: INT
+      delivery_base_fee: DECIMAL(2, 2)
+    range:
+      delivery_base_fee: [0.0, 200]
+    foreign_keys:
+      city_id: cities.city_id
+
+  categories:
+    not_null: [category_id, category_name]
+    unique: [category_id]
+    data_types:
+      category_id: INT
+      category_name: VARCHAR(50)
+
+  reason_categories:
+    not_null: [reason_category_id, category_name]
+    unique: [reason_category_id]
+    data_types:
+      reason_category_id: INT
+      category_name: VARCHAR(50)
+
+  reasons:
+    not_null: [reason_id, reason_name, reason_category_id, severity_level, typical_refund_pct]
+    unique: [reason_id]
+    data_types:
+      reason_id: INT
+      reason_name: VARCHAR(50)
+      reason_category_id: INT
+      severity_level: INT
+      typical_refund_pct: DECIMAL(1, 2)
+    range:
+      severity_level: [1, 5]
+      typical_refund_pct: [0.0, 1.0]
+    foreign_keys:
+      reason_category_id: reason_categories.reason_category_id
+  
+  segments:
+    not_null: [segment_id, segment_name, discount_pct, priority_support]
+    unique: [segment_id]
+    data_types:
+      segment_id: INT
+      segment_name: VARCHAR(50)
+      discount_pct: INT
+      priority_support: BOOLEAN
+
+    range:
+      discount_pct: [0, 100]
+
+  teams:
+    not_null: [team_id, team_name]
+    unique: [team_id]
+    data_types:
+      team_id: INT
+      team_name: VARCHAR(50)
+
+  channels:
+    not_null: [channel_id, channel_name]
+    unique: [channel_id]
+    data_types:
+      channel_id: INT
+      channel_name: VARCHAR(50)
+
+  priorities:
+    not_null: [priority_id, priority_code, priority_name, sla_first_response_min, sla_resolution_min]
+    unique: [priority_id]
+    data_types:
+      priority_id: INT
+      priority_code:  VARCHAR(50) 
+      priority_name:  VARCHAR(50)
+      sla_first_response_min: INT
+      sla_resolution_min: INT
+    range:
+      sla_first_response_min: [0, 1440]
+      sla_resolution_min: [0, 1440]
 
 # ─────────────────────────────────────────
 # ORPHAN HANDLING
