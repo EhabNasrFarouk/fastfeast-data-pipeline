@@ -200,7 +200,7 @@ validation:
     not_null: [agent_id, agent_phone, skill_level, team_id, is_active, hire_date, avg_handle_time_min, resolution_rate, csat_score]
     
     data_types:
-      agent_id: INT	
+      agent_id: INT
       agent_name: VARCHAR(100)
       agent_email:  VARCHAR(100)
       agent_phone:  VARCHAR(15)

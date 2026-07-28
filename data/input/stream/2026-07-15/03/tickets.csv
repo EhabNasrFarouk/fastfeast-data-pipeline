@@ -1,1 +1,0 @@
-ticket_id,order_id,customer_id,driver_id,restaurant_id,agent_id,reason_id,priority_id,channel_id,status,refund_amount,created_at,first_response_at,resolved_at,sla_first_due_at,sla_resolve_due_at

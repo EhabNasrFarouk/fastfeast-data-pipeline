@@ -1,2 +1,0 @@
-ticket_id,order_id,customer_id,driver_id,restaurant_id,agent_id,reason_id,priority_id,channel_id,status,refund_amount,created_at,first_response_at,resolved_at,sla_first_due_at,sla_resolve_due_at
-c778be6c-a59b-42fd-8be2-be355065d838,c5155f5b-30bb-49f9-92c2-3dd2317a7a25,295,93,41,17,8,2,1,Resolved,40.5,2026-07-10 03:10:28,2026-07-10 03:11:19,2026-07-10 03:52:28,2026-07-10 03:11:28,2026-07-10 03:25:28

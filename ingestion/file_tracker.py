@@ -31,6 +31,7 @@ def init_tracker_table(con=None):
             file_id          VARCHAR PRIMARY KEY,
             run_id           VARCHAR,
             filepath         VARCHAR,
+            file_type        VARCHAR,
             file_hash        VARCHAR,
             file_size_bytes  BIGINT,
             layer            VARCHAR,
