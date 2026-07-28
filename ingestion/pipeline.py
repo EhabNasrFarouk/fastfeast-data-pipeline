@@ -1,15 +1,19 @@
 import sys
+import polars as pl
 from pathlib import Path
+from datetime import date
 
 root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(root))
 from ingestion.file_tracker import start_file_tracking
+from ingestion.parser import read_file
 
 
-def process_file(run_id, file_path, file_type, run_date, run_hour=None):
+def process_file(run_id: str, file_path: str, file_type: str, run_date: date, run_hour=None):
     # Tracking Part
     layer = "Tracking Phase"
     source_table = file_path.split("\\")[-1].split(".")[0]
+    # ***** We must add the file_type in the table *****
     start_file_tracking(file_path, run_id, layer, source_table, run_date, run_hour)
 
     # Testing
@@ -24,3 +28,8 @@ def process_file(run_id, file_path, file_type, run_date, run_hour=None):
 
 
     # Parsing Part
+    pl = read_file(file_path, run_id, source_table)
+    print(source_table)
+    print(pl.collect())
+    print(f"{source_table} finished")
+    print("-" * 20)

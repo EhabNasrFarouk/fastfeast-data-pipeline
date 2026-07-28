@@ -1,0 +1,19 @@
+{
+    "workbench.editorAssociations": {
+        "*.copilotmd": "vscode.markdown.preview.editor",
+        "*.jar": "default",
+        "*.parquet": "duckdb.dataFileViewer",
+        "*.csv": "duckdb.dataFileViewer",
+        "*.tsv": "duckdb.dataFileViewer",
+        "*.xlsx": "duckdb.dataFileViewer"
+    },
+    "duckdb.databases": [
+        {
+            "alias": "fastfeast",
+            "type": "file",
+            "path": "f:\\ITI\\17-Python\\New Project\\FastFeast\\fastfeast-data-pipeline\\warehouse\\fastfeast.duckdb",
+            "attached": false
+        }
+    ],
+    "duckdb.defaultDatabase": "fastfeast"
+}
