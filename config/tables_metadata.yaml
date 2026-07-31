@@ -18,7 +18,7 @@ Batch:
       unique:    [customer_id]
       regex:
         email: '^[^@\s]+@[^@\s]+\.[^@\s]+$'
-        phone: '^01[0-25][0-9]{8}$'
+        phone: '^1[0-25][0-9]{8}$'
 
       allowed_values:
         gender: [male, female]
