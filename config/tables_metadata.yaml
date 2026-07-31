@@ -18,7 +18,7 @@ Batch:
       unique:    [customer_id]
       regex:
         email: '^[^@\s]+@[^@\s]+\.[^@\s]+$'
-        phone: '^1[0-25][0-9]{8}$'
+        phone: '^01[0-25][0-9]{8}$'
 
       allowed_values:
         gender: [male, female]
@@ -118,7 +118,7 @@ Batch:
 
     regex:
       agent_email: '^[^@\s]+@[^@\s]+\.[^@\s]+$'
-      agent_phone: '^[0-9]{10}$' # It starts with 1
+      agent_phone: '^1[0-25][0-9]{8}$' # It starts with 1
 
     foreign_keys:
       team_id: teams.team_id

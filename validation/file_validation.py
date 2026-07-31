@@ -6,79 +6,15 @@ from pathlib import Path
 
 # -------------------------- Handling Paths --------------------------
 root = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(root))
+from validation.validators import *
+
 metadata_path = root / "config" / "tables_metadata.yaml"
 
 
-# -------------------------- Validators --------------------------
-def null_validator(lf: pl.LazyFrame, columns: list[str]):
-    error_frames = []
-      
-    for col_nm in columns:
-        errors = (
-            lf.filter(pl.col(col_nm).is_null())
-                .select(
-                    "row_number",
-                    pl.lit(col_nm).alias("column_name"),
-                    pl.lit("NULL_VALUE").alias("error_type"),
-                    pl.col(col_nm).cast(pl.String).alias("invalid_value")
-                )
-        )
-        error_frames.append(errors)
-
-    rs = pl.concat(error_frames)
-    print(rs.collect())
-
-def duplicate_validator(lf: pl.LazyFrame, columns: list[str]):
-    error_frames = []
-           
-    for col_nm in columns:
-        errors = (
-            lf.filter(
-                    pl.col(col_nm).is_duplicated() &
-                    ~pl.col(col_nm).is_first_distinct()
-                )
-                .select(
-                    "row_number",
-                    pl.lit(col_nm).alias("column_name"),
-                    pl.lit("DUPLICATE_KEY").alias("error_type"),
-                    pl.col(col_nm).cast(pl.String).alias("invalid_value")
-                )
-        )
-        error_frames.append(errors)
-
-    rs = pl.concat(error_frames)
-    print(rs.collect())
-
-def data_type_validator(lf: pl.LazyFrame, columns: dict):
-    error_frames = []
-    STR_TO_DTYPE = {
-        "pl.Int64": pl.Int64,
-        "pl.Utf8": pl.String,
-        "pl.Boolean": pl.Boolean,
-        "pl.Date": pl.Date,
-        "pl.Timestamp": pl.Datetime,
-        "pl.Decimal": pl.Decimal
-    }
-                
-    for col_nm, data_type in columns.items():
-        #  print(col_nm, data_type)
-        errors = (
-            lf.filter(
-                    pl.col(col_nm).is_not_null() &
-                    pl.col(col_nm).cast(STR_TO_DTYPE[data_type], strict=False).is_null()
-                )
-                .select(
-                    "row_number",
-                    pl.lit(col_nm).alias("column_name"),
-                    pl.lit("INVALID_DTYPE").alias("error_type"),
-                    pl.col(col_nm).cast(pl.String).alias("invalid_value")
-                )
-        )
-        error_frames.append(errors)
-
-    rs = pl.concat(error_frames)
-    print(rs.collect())
-     
+test = {
+    "not_null": null_validator 
+}
 
 # -------------------------- Main Function --------------------------
 def process_data(lf: pl.LazyFrame, type: str, source_table: str):    
@@ -86,16 +22,26 @@ def process_data(lf: pl.LazyFrame, type: str, source_table: str):
     with open(metadata_path, 'r') as f:
         md = yaml.safe_load(f)
 
-    # null_validator(lf, md[type][source_table]["not_null"])
-    # duplicate_validator(lf, md[type][source_table]["unique"])
-    data_type_validator(lf, md[type][source_table]["data_types"])
+    # md[type][source_table]
+
+    null_errors = null_validator(lf, md[type][source_table]["not_null"])
+    duplicate_errors = duplicate_validator(lf, md[type][source_table]["unique"])
+    data_type_errors = data_type_validator(lf, md[type][source_table]["data_types"])
+    regex_errors = regex_validator(lf, md[type][source_table]["regex"])
+    allowed_values_errors = allowed_values_validator(lf, md[type][source_table]["allowed_values"])
+    # range_errors = range_validator(lf, md[type][source_table]["range"])
+
+    all_errors = pl.concat([null_errors, duplicate_errors, data_type_errors, regex_errors,
+                           allowed_values_errors])
+
+    all_errors.collect().write_csv("output.csv")
 
     # print(md[type][source_table]["not_null"])
     # print("-" * 30)
     # print(yaml.dump(md[type][source_table], indent=4, sort_keys=False))
 
     # 2- Looping over the table
-    pass
+    # pass
 
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------
