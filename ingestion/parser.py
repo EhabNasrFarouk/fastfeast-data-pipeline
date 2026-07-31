@@ -33,12 +33,12 @@ def read_file(file_path: str, run_id: str, source_table: str) -> pl.LazyFrame | 
     try:
         match path.suffix.lower():
             case ".csv":
-                return pl.scan_csv(file_path)
+                return pl.scan_csv(file_path).with_row_index("row_number")
             
             case ".json":
                 with open(file_path) as f: # This is to handle NaN problem.
-                    data = json.load(f)
-                return pl.DataFrame(data).lazy()
+                    clean_json_str = f.read().replace("NaN", "null")
+                return pl.DataFrame(clean_json_str.encode()).lazy().with_row_index("row_number")
             
             case _:
                 # The file type isn't supported [InvalidFormat]

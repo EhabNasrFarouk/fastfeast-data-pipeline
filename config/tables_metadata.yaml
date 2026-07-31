@@ -4,21 +4,24 @@ Batch:
       not_null:  [customer_id, segment_id, phone, gender, region_id, signup_date]
 
       data_types:
-        customer_id:  INT
-        full_name:  VARCHAR(100)
-        email:  VARCHAR(100)
-        phone:  VARCHAR(15)
-        region_id:  INT
-        segment_id: INT
-        signup_date:  DATE
-        gender: ENUM('male','female')
-        created_at: TIMESTAMP
-        updated_at: TIMESTAMP
+        customer_id:  pl.Int64
+        full_name:  pl.Utf8
+        email:  pl.Utf8
+        phone:  pl.Utf8
+        region_id:  pl.Int64
+        segment_id: pl.Int64
+        signup_date:  pl.Date
+        gender: pl.Utf8
+        created_at: pl.Timestamp
+        updated_at: pl.Timestamp
 
       unique:    [customer_id]
       regex:
         email: '^[^@\s]+@[^@\s]+\.[^@\s]+$'
         phone: '^01[0-25][0-9]{8}$'
+
+      allowed_values:
+        gender: [male, female]
 
       foreign_keys:
         region_id:  regions.region_id
@@ -28,21 +31,21 @@ Batch:
     not_null: [driver_id, shift, vehicle_type, region_id, national_id, hire_date, rating_avg, on_time_rate, cancel_rate, completed_deliveries, is_active]
 
     data_types:
-      driver_id:  INT
-      driver_name:  VARCHAR(100)
-      driver_phone: VARCHAR(15)
-      national_id:  VARCHAR(14)
-      region_id:  INT
-      shift:  VARCHAR(10)
-      vehicle_type: VARCHAR(15)
-      hire_date:  DATE
-      rating_avg: DECIMAL(3,2)
-      on_time_rate: DECIMAL(3,2)
-      cancel_rate:  DECIMAL(3,2)
-      completed_deliveries: INT
-      is_active:  BOOLEAN
-      created_at: TIMESTAMP
-      updated_at: TIMESTAMP
+      driver_id:  pl.Int64
+      driver_name:  pl.Utf8
+      driver_phone: pl.Utf8
+      national_id:  pl.Utf8
+      region_id:  pl.Int64
+      shift:  pl.Utf8
+      vehicle_type: pl.Utf8
+      hire_date:  pl.Date
+      rating_avg: pl.Decimal
+      on_time_rate: pl.Decimal
+      cancel_rate:  pl.Decimal
+      completed_deliveries: pl.Int64
+      is_active:  pl.Boolean
+      created_at: pl.Timestamp
+      updated_at: pl.Timestamp
 
     unique:   [driver_id, national_id]
     range:
@@ -63,16 +66,16 @@ Batch:
     not_null: [restaurant_id, restaurant_name, region_id, category_id, price_tier, is_active, rating_avg, prep_time_avg_min]
 
     data_types:
-      restaurant_id:  INT
-      restaurant_name:  VARCHAR(100)
-      region_id:  INT
-      category_id:  INT
-      price_tier: VARCHAR(10)
-      rating_avg: DECIMAL(3,2)
-      prep_time_avg_min:  INT
-      is_active:  BOOLEAN
-      created_at: TIMESTAMP
-      updated_at: TIMESTAMP
+      restaurant_id:  pl.Int64
+      restaurant_name:  pl.Utf8
+      region_id:  pl.Int64
+      category_id:  pl.Int64
+      price_tier: pl.Utf8
+      rating_avg: pl.Decimal
+      prep_time_avg_min:  pl.Int64
+      is_active:  pl.Boolean
+      created_at: pl.Timestamp
+      updated_at: pl.Timestamp
 
     unique:   [restaurant_id]
     range:
@@ -88,19 +91,19 @@ Batch:
     not_null: [agent_id, agent_phone, skill_level, team_id, is_active, hire_date, avg_handle_time_min, resolution_rate, csat_score]
     
     data_types:
-      agent_id: INT	
-      agent_name: VARCHAR(100)
-      agent_email:  VARCHAR(100)
-      agent_phone:  VARCHAR(15)
-      team_id:  INT
-      skill_level:  VARCHAR(10)
-      hire_date:  DATE
-      avg_handle_time_min:  INT
-      resolution_rate:  DECIMAL(3, 2)
-      csat_score: DECIMAL(3, 2)
-      is_active:  BOOLEAN
-      created_at: TIMESTAMP
-      updated_at: TIMESTAMP
+      agent_id: pl.Int64
+      agent_name: pl.Utf8
+      agent_email:  pl.Utf8
+      agent_phone:  pl.Utf8
+      team_id:  pl.Int64
+      skill_level:  pl.Utf8
+      hire_date:  pl.Date
+      avg_handle_time_min:  pl.Int64
+      resolution_rate:  pl.Decimal
+      csat_score: pl.Decimal
+      is_active:  pl.Boolean
+      created_at: pl.Timestamp
+      updated_at: pl.Timestamp
 
 
     unique:   [agent_id]
@@ -124,19 +127,19 @@ Batch:
     not_null: [city_id, city_name, country, timezone]
     unique: [city_id]
     data_types:
-      city_id:  INT
-      city_name:  VARCHAR(50)
-      country:  VARCHAR(50)
-      timezone: VARCHAR(50)
+      city_id:  pl.Int64
+      city_name:  pl.Utf8
+      country:  pl.Utf8
+      timezone: pl.Utf8
       
   regions:
     not_null: [region_id, region_name, city_id, delivery_base_fee]
     unique: [region_id]
     data_types:
-      region_id: INT
-      region_name: VARCHAR(50)
-      city_id: INT
-      delivery_base_fee: DECIMAL(2, 2)
+      region_id: pl.Int64
+      region_name: pl.Utf8
+      city_id: pl.Int64
+      delivery_base_fee: pl.Decimal
     range:
       delivery_base_fee: [0.0, 200]
     foreign_keys:
@@ -146,25 +149,25 @@ Batch:
     not_null: [category_id, category_name]
     unique: [category_id]
     data_types:
-      category_id: INT
-      category_name: VARCHAR(50)
+      category_id: pl.Int64
+      category_name: pl.Utf8
 
   reason_categories:
     not_null: [reason_category_id, category_name]
     unique: [reason_category_id]
     data_types:
-      reason_category_id: INT
-      category_name: VARCHAR(50)
+      reason_category_id: pl.Int64
+      category_name: pl.Utf8
 
   reasons:
     not_null: [reason_id, reason_name, reason_category_id, severity_level, typical_refund_pct]
     unique: [reason_id]
     data_types:
-      reason_id: INT
-      reason_name: VARCHAR(50)
-      reason_category_id: INT
-      severity_level: INT
-      typical_refund_pct: DECIMAL(1, 2)
+      reason_id: pl.Int64
+      reason_name: pl.Utf8
+      reason_category_id: pl.Int64
+      severity_level: pl.Int64
+      typical_refund_pct: pl.Decimal
     range:
       severity_level: [1, 5]
       typical_refund_pct: [0.0, 1.0]
@@ -175,10 +178,10 @@ Batch:
     not_null: [segment_id, segment_name, discount_pct, priority_support]
     unique: [segment_id]
     data_types:
-      segment_id: INT
-      segment_name: VARCHAR(50)
-      discount_pct: INT
-      priority_support: BOOLEAN
+      segment_id: pl.Int64
+      segment_name: pl.Utf8
+      discount_pct: pl.Int64
+      priority_support: pl.Boolean
 
     range:
       discount_pct: [0, 100]
@@ -187,25 +190,25 @@ Batch:
     not_null: [team_id, team_name]
     unique: [team_id]
     data_types:
-      team_id: INT
-      team_name: VARCHAR(50)
+      team_id: pl.Int64
+      team_name: pl.Utf8
 
   channels:
     not_null: [channel_id, channel_name]
     unique: [channel_id]
     data_types:
-      channel_id: INT
-      channel_name: VARCHAR(50)
+      channel_id: pl.Int64
+      channel_name: pl.Utf8
 
   priorities:
     not_null: [priority_id, priority_code, priority_name, sla_first_response_min, sla_resolution_min]
     unique: [priority_id]
     data_types:
-      priority_id: INT
-      priority_code:  VARCHAR(50) 
-      priority_name:  VARCHAR(50)
-      sla_first_response_min: INT
-      sla_resolution_min: INT
+      priority_id: pl.Int64
+      priority_code:  pl.Utf8
+      priority_name:  pl.Utf8
+      sla_first_response_min: pl.Int64
+      sla_resolution_min: pl.Int64
     range:
       sla_first_response_min: [0, 1440]
       sla_resolution_min: [0, 1440]
@@ -217,19 +220,19 @@ Stream:
     not_null: [order_id, customer_id, restaurant_id, driver_id, region_id, order_status, payment_method, order_amount, delivery_fee, discount_amount, total_amount, order_created_at, delivered_at]
     
     data_types:
-      order_id: VARCHAR(36)
-      customer_id: INT
-      restaurant_id: INT
-      driver_id: INT
-      region_id: INT
-      order_amount: DECIMAL(10,2)
-      delivery_fee: DECIMAL(10,2)
-      discount_amount: DECIMAL(10,2)
-      total_amount: DECIMAL(10,2)
-      order_status: VARCHAR(20)
-      payment_method: VARCHAR(10)
-      order_created_at: TIMESTAMP
-      delivered_at: TIMESTAMP
+      order_id: pl.Utf8
+      customer_id: pl.Int64
+      restaurant_id: pl.Int64
+      driver_id: pl.Int64
+      region_id: pl.Int64
+      order_amount: pl.Decimal
+      delivery_fee: pl.Decimal
+      discount_amount: pl.Decimal
+      total_amount: pl.Decimal
+      order_status: pl.Utf8
+      payment_method: pl.Utf8
+      order_created_at: pl.Timestamp
+      delivered_at: pl.Timestamp
     
     unique:   [order_id]
     range:
@@ -250,22 +253,22 @@ Stream:
     not_null: [ticket_id, order_id, customer_id, agent_id, reason_id, priority_id, channel_id, status, created_at]
     
     data_types:
-      ticket_id: VARCHAR(36)  
-      order_id: VARCHAR(36)   
-      customer_id: INT  
-      driver_id: INT
-      restaurant_id: INT
-      agent_id: INT
-      reason_id: INT
-      priority_id: INT
-      channel_id: INT
-      status: VARCHAR(20)
-      refund_amount: DECIMAL(10,2)
-      created_at: TIMESTAMP
-      first_response_at: TIMESTAMP
-      resolved_at: TIMESTAMP
-      sla_first_due_at: TIMESTAMP
-      sla_resolve_due_at: TIMESTAMP
+      ticket_id: pl.Utf8
+      order_id: pl.Utf8
+      customer_id: pl.Int64
+      driver_id: pl.Int64
+      restaurant_id: pl.Int64
+      agent_id: pl.Int64
+      reason_id: pl.Int64
+      priority_id: pl.Int64
+      channel_id: pl.Int64
+      status: pl.Utf8
+      refund_amount: pl.Decimal
+      created_at: pl.Timestamp
+      first_response_at: pl.Timestamp
+      resolved_at: pl.Timestamp
+      sla_first_due_at: pl.Timestamp
+      sla_resolve_due_at: pl.Timestamp
     
     unique:   [ticket_id]
     allowed_values:
@@ -284,13 +287,13 @@ Stream:
     not_null: [event_id, ticket_id, agent_id, event_ts, new_status]
     
     data_types:
-      event_id: VARCHAR(36)  
-      ticket_id: VARCHAR(36)  
-      agent_id: INT
-      event_ts: TIMESTAMP
-      old_status: VARCHAR(20)
-      new_status: VARCHAR(20)
-      notes: TEXT
+      event_id: pl.Utf8
+      ticket_id: pl.Utf8
+      agent_id: pl.Int64
+      event_ts: pl.Timestamp
+      old_status: pl.Utf8
+      new_status: pl.Utf8
+      notes: pl.Utf8
     
     unique: [event_id]
     allowed_values:
