@@ -13,7 +13,7 @@ Batch:
         signup_date:  pl.Date
         gender: pl.Utf8
         created_at: pl.Timestamp
-        updated_at: pl.Timestamp
+        updated_at: pl.Time
 
       unique:    [customer_id]
       regex:
@@ -45,7 +45,7 @@ Batch:
       completed_deliveries: pl.Int64
       is_active:  pl.Boolean
       created_at: pl.Timestamp
-      updated_at: pl.Timestamp
+      updated_at: pl.Time
 
     unique:   [driver_id, national_id]
     range:
@@ -103,7 +103,7 @@ Batch:
       csat_score: pl.Decimal
       is_active:  pl.Boolean
       created_at: pl.Timestamp
-      updated_at: pl.Timestamp
+      updated_at: pl.Time
 
 
     unique:   [agent_id]

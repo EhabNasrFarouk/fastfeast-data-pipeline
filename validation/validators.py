@@ -50,15 +50,31 @@ def data_type_validator(lf: pl.LazyFrame, columns: dict[str, list]) -> pl.LazyFr
         "pl.Boolean": pl.Boolean,
         "pl.Date": pl.Date,
         "pl.Timestamp": pl.Datetime,
-        "pl.Decimal": pl.Decimal
+        "pl.Decimal": pl.Decimal,
+        "pl.Time": pl.Time
     }
                 
     for col_nm, data_type in columns.items():
-        #  print(col_nm, data_type)
+        target_type = STR_TO_DTYPE[data_type]
+        parsed_expr = pl.col(col_nm).cast(STR_TO_DTYPE[data_type], strict=False)
+        # print(target_type)
+
+        if target_type == pl.Date:
+            parsed_expr = pl.col(col_nm).str.to_date("%m/%d/%Y", strict=False)
+            # print(col_nm, data_type)
+
+        elif target_type == pl.Datetime:
+            parsed_expr = pl.col(col_nm).str.to_datetime("%m/%d/%Y %H:%M", strict=False)
+            # print(col_nm, data_type)
+
+        elif target_type == pl.Time:
+                parsed_expr = pl.col(col_nm).str.replace(r"\.[0-9]$", "").str.to_time("%H:%M", strict=False)
+                # print(col_nm, data_type)
+        
         errors = (
             lf.filter(
                     pl.col(col_nm).is_not_null() &
-                    pl.col(col_nm).cast(STR_TO_DTYPE[data_type], strict=False).is_null()
+                    parsed_expr.is_null()
                 )
                 .select(
                     "row_number",

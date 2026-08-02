@@ -8,19 +8,19 @@ from pathlib import Path
 root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(root))
 from validation.validators import *
+from config.config_loader import load_metadata
 
 metadata_path = root / "config" / "tables_metadata.yaml"
 
 
-test = {
-    "not_null": null_validator 
-}
+# test = {
+#     "not_null": null_validator 
+# }
 
 # -------------------------- Main Function --------------------------
 def process_data(lf: pl.LazyFrame, type: str, source_table: str):    
     # Reading metadta
-    with open(metadata_path, 'r') as f:
-        md = yaml.safe_load(f)
+    md = load_metadata()
 
     # md[type][source_table]
 

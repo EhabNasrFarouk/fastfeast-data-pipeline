@@ -6,6 +6,7 @@ from pathlib import Path
 root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(root))
 from ingestion.file_tracker import get_connection
+from config.config_loader import load_metadata
 
 file_not_found = "FileNotFoundError"
 corrupted_file = "ComputeError"
@@ -30,15 +31,20 @@ def handle_error(run_id: str, source_table: str, error_msg):
 def read_file(file_path: str, run_id: str, source_table: str) -> pl.LazyFrame | None:
     path = Path(file_path)
 
+    # Getting the table columns from the metadata file.
+    file_type = "Stream" if source_table in ["orders", "tickets", "ticket_events"] else "Batch"
+    columns = load_metadata()[file_type][source_table]["data_types"].keys()
+    dynamic_overrides = {col_nm: pl.String for col_nm in columns}
+
     try:
         match path.suffix.lower():
             case ".csv":
-                return pl.scan_csv(file_path).with_row_index("row_number")
+                return pl.scan_csv(file_path, schema_overrides=dynamic_overrides).with_row_index("row_number")
             
             case ".json":
                 with open(file_path) as f: # This is to handle NaN problem.
                     clean_json_str = f.read().replace("NaN", "null")
-                return pl.DataFrame(clean_json_str.encode()).lazy().with_row_index("row_number")
+                return pl.read_json(clean_json_str.encode(), schema_overrides=dynamic_overrides).lazy().with_row_index("row_number")
             
             case _:
                 # The file type isn't supported [InvalidFormat]
@@ -60,6 +66,7 @@ def read_file(file_path: str, run_id: str, source_table: str) -> pl.LazyFrame | 
         return None
 
 
+# ------------------------------- TESTING -------------------------------
 # lf = read_file("F:\\ITI\\17-Python\\New Project\\FastFeast\\fastfeast-data-pipeline\\data\\input\\stream\\2026-06-18\\13\\orders.json", "3d56aafc-36f4-4d09-95d5-d871229ac81f", "orders")
 # print(lf.collect())
 # print(lf)
