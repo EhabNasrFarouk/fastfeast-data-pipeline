@@ -1,0 +1,3 @@
+ticket_id,order_id,customer_id,driver_id,restaurant_id,agent_id,reason_id,priority_id,channel_id,status,refund_amount,created_at,first_response_at,resolved_at,sla_first_due_at,sla_resolve_due_at
+3be2b68a-4275-45c7-a908-3fbcf7242dc4,2a264de8-6b50-4e0f-b67f-e8dbf752087f,357,51,17,7,9,2,2,Closed,10.05,2026-08-01 03:10:46,2026-08-01 03:11:06,2026-08-01 03:15:46,2026-08-01 03:11:46,2026-08-01 03:25:46
+f8d6a024-85e1-4586-a1ab-b6e94b655cd1,696c471d-36f1-43ed-a07e-92c139669f10,261,8,49,4,2,4,4,Resolved,158.24,2026-08-01 01:49:39,2026-08-01 01:52:41,2026-08-01 02:44:39,2026-08-01 01:50:39,2026-08-01 02:04:39

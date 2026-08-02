@@ -9,7 +9,11 @@ sys.path.insert(0, str(root))
 from ingestion.stream.stream_watcher import run_stream_watcher
 from ingestion.thread_pool import PipelineManager
 from ingestion.batch.scheduler import run_batch_watcher
+from ingestion.file_tracker import init_tracker_table
 
+# Must run before either watcher starts — both read/write etl_file_tracker
+# on the first file they see, and the table doesn't exist until this creates it.
+init_tracker_table()
 
 pipeline_mng = PipelineManager()
 

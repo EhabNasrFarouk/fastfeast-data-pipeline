@@ -1,0 +1,74 @@
+[
+  {
+    "event_id": "0322be81-ceba-48cc-ae32-eb645b369bfe",
+    "ticket_id": "3be2b68a-4275-45c7-a908-3fbcf7242dc4",
+    "agent_id": 7,
+    "event_ts": "2026-08-01 03:10:46",
+    "old_status": NaN,
+    "new_status": "Open",
+    "notes": "Ticket created"
+  },
+  {
+    "event_id": "bea8680a-e9f2-4a09-ad8e-ef55fbed96ed",
+    "ticket_id": "3be2b68a-4275-45c7-a908-3fbcf7242dc4",
+    "agent_id": 7,
+    "event_ts": "2026-08-01 03:11:06",
+    "old_status": "Open",
+    "new_status": "InProgress",
+    "notes": "Agent responded"
+  },
+  {
+    "event_id": "dbace9eb-c14e-422d-9536-e87cd10e5217",
+    "ticket_id": "3be2b68a-4275-45c7-a908-3fbcf7242dc4",
+    "agent_id": 7,
+    "event_ts": "2026-08-01 03:15:46",
+    "old_status": "InProgress",
+    "new_status": "Closed",
+    "notes": "Ticket closed"
+  },
+  {
+    "event_id": "aae96684-f387-4092-9fac-75e446c8c570",
+    "ticket_id": "f8d6a024-85e1-4586-a1ab-b6e94b655cd1",
+    "agent_id": 4,
+    "event_ts": "2026-08-01 01:49:39",
+    "old_status": NaN,
+    "new_status": "Open",
+    "notes": "Ticket created"
+  },
+  {
+    "event_id": "130aee76-3264-4969-95f2-c3273f4f7fe0",
+    "ticket_id": "f8d6a024-85e1-4586-a1ab-b6e94b655cd1",
+    "agent_id": 4,
+    "event_ts": "2026-08-01 01:52:41",
+    "old_status": "Open",
+    "new_status": "InProgress",
+    "notes": "Agent responded"
+  },
+  {
+    "event_id": "1a3bbeb8-8c72-4504-abb4-887353607c90",
+    "ticket_id": "f8d6a024-85e1-4586-a1ab-b6e94b655cd1",
+    "agent_id": 4,
+    "event_ts": "2026-08-01 02:44:39",
+    "old_status": "InProgress",
+    "new_status": "Resolved",
+    "notes": "Ticket resolved"
+  },
+  {
+    "event_id": "c1fe1c99-6c96-4976-829c-a99dfe0f8e3a",
+    "ticket_id": "f8d6a024-85e1-4586-a1ab-b6e94b655cd1",
+    "agent_id": 4,
+    "event_ts": "2026-08-01 04:12:39",
+    "old_status": "Resolved",
+    "new_status": "Reopened",
+    "notes": "Customer reported issue not resolved"
+  },
+  {
+    "event_id": "d356be78-1d79-4c10-9dd6-f7f76275bbfd",
+    "ticket_id": "f8d6a024-85e1-4586-a1ab-b6e94b655cd1",
+    "agent_id": 4,
+    "event_ts": "2026-08-01 05:30:39",
+    "old_status": "Reopened",
+    "new_status": "Resolved",
+    "notes": "Issue finally resolved"
+  }
+]

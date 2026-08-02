@@ -19,6 +19,7 @@ Ingestion:
 
 paths:
   output_dir:        data/output
+  quarantine_dir:     data/quarantine
   warehouse_dir:     warehouse
   observability_dir: observability
   reporting_dir:     reporting
@@ -476,6 +477,6 @@ file_tracker:
   max_retries:   3
 
 cron:
-  day_of_week: wed
-  hour:        11
-  minute:      40
+  day_of_week: sun
+  hour:        19
+  minute:      04

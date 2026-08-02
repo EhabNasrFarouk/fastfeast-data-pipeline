@@ -131,6 +131,8 @@ def start_file_tracking(filepath, run_id, layer, source_table, run_date, run_hou
             run_id = excluded.run_id,
             file_hash = excluded.file_hash,
             file_size_bytes = excluded.file_size_bytes,
+            layer = excluded.layer,
+            source_table = excluded.source_table,
             status = 'pending',
             pipeline_version = excluded.pipeline_version,
             started_at = excluded.started_at,

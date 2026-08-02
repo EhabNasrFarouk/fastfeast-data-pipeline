@@ -1,0 +1,56 @@
+[
+  {
+    "event_id": "c95338f7-1a5b-4283-99e8-4718ff282b20",
+    "ticket_id": "6ccc1ddd-eec7-4df9-b137-1fb82c487eb2",
+    "agent_id": 19,
+    "event_ts": "2026-08-02 03:12:38",
+    "old_status": NaN,
+    "new_status": "Open",
+    "notes": "Ticket created"
+  },
+  {
+    "event_id": "8f02b7c3-d8bf-437e-a392-fec2926f8044",
+    "ticket_id": "6ccc1ddd-eec7-4df9-b137-1fb82c487eb2",
+    "agent_id": 19,
+    "event_ts": "2026-08-02 03:13:24",
+    "old_status": "Open",
+    "new_status": "InProgress",
+    "notes": "Agent responded"
+  },
+  {
+    "event_id": "b9c5cee0-71ce-4cdc-9f9c-d133f6632317",
+    "ticket_id": "6ccc1ddd-eec7-4df9-b137-1fb82c487eb2",
+    "agent_id": 19,
+    "event_ts": "2026-08-02 03:24:38",
+    "old_status": "InProgress",
+    "new_status": "Resolved",
+    "notes": "Ticket resolved"
+  },
+  {
+    "event_id": "5542a492-11ff-4693-8282-df8712b79917",
+    "ticket_id": "84ff7ef9-4592-4778-9813-93974f7f8275",
+    "agent_id": 19,
+    "event_ts": "2026-08-02 03:30:39",
+    "old_status": NaN,
+    "new_status": "Open",
+    "notes": "Ticket created"
+  },
+  {
+    "event_id": "32cf6417-12fc-495d-b82d-5ac266fdd94a",
+    "ticket_id": "84ff7ef9-4592-4778-9813-93974f7f8275",
+    "agent_id": 19,
+    "event_ts": "2026-08-02 03:31:03",
+    "old_status": "Open",
+    "new_status": "InProgress",
+    "notes": "Agent responded"
+  },
+  {
+    "event_id": "36078d5c-7d08-4252-9904-66a31eb8fbea",
+    "ticket_id": "84ff7ef9-4592-4778-9813-93974f7f8275",
+    "agent_id": 19,
+    "event_ts": "2026-08-02 03:36:39",
+    "old_status": "InProgress",
+    "new_status": "Resolved",
+    "notes": "Ticket resolved"
+  }
+]
