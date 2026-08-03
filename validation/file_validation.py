@@ -1,8 +1,8 @@
 import sys
-import json
-import yaml
 import polars as pl
 from pathlib import Path
+from dataclasses import dataclass
+
 
 # -------------------------- Handling Paths --------------------------
 root = Path(__file__).resolve().parent.parent
@@ -10,51 +10,71 @@ sys.path.insert(0, str(root))
 from validation.validators import *
 from config.config_loader import load_metadata
 
-metadata_path = root / "config" / "tables_metadata.yaml"
+
+RULES = {
+    "not_null": null_validator,
+    "unique": duplicate_validator,
+    "data_types": data_type_validator,
+    "range": range_validator,
+    "regex": regex_validator,
+    "allowed_values": allowed_values_validator,
+}
 
 
-# test = {
-#     "not_null": null_validator 
-# }
+@dataclass
+class ValidationResult:
+    valid_lf: pl.LazyFrame
+    errors_lf: pl.LazyFrame
+    total_rows: int
+    error_row_count: int
+
 
 # -------------------------- Main Function --------------------------
-def process_data(lf: pl.LazyFrame, type: str, source_table: str):    
-    # Reading metadta
-    md = load_metadata()
+def validate_file(lf: pl.LazyFrame, file_type: str, source_table: str) -> ValidationResult:
+    # print(f"Validating Phase for {source_table} table.", "\n------------------------------------\n")
 
-    # md[type][source_table]
+    metadata = load_metadata()
+    layer_key = file_type.strip().title()
 
-    null_errors = null_validator(lf, md[type][source_table]["not_null"])
-    duplicate_errors = duplicate_validator(lf, md[type][source_table]["unique"])
-    data_type_errors = data_type_validator(lf, md[type][source_table]["data_types"])
-    regex_errors = regex_validator(lf, md[type][source_table]["regex"])
-    allowed_values_errors = allowed_values_validator(lf, md[type][source_table]["allowed_values"])
-    # range_errors = range_validator(lf, md[type][source_table]["range"])
+    table_rules = metadata[layer_key][source_table]
+ 
+    error_frames = [empty_errors()]
+    for rule_key, validator_fn in RULES.items():
+        if rule_key not in table_rules:
+            continue
+        
+        error_frames.append(validator_fn(lf, table_rules[rule_key]))
 
-    all_errors = pl.concat([null_errors, duplicate_errors, data_type_errors, regex_errors,
-                           allowed_values_errors])
+    errors_lf = pl.concat(error_frames)
 
-    all_errors.collect().write_csv("output.csv")
+    errors_lf = pl.concat(error_frames)
+    
+    bad_row_numbers = errors_lf.select("row_number").unique()
 
-    # print(md[type][source_table]["not_null"])
-    # print("-" * 30)
-    # print(yaml.dump(md[type][source_table], indent=4, sort_keys=False))
+    valid_lf = lf.join(bad_row_numbers, on="row_number", how="anti")
 
-    # 2- Looping over the table
-    # pass
+    total_rows = lf.select(pl.len()).collect().item()
+    error_row_count = bad_row_numbers.select(pl.len()).collect().item()
+    print(f"[{source_table}] Validation complete: {error_row_count} errors out of {total_rows} rows.")
+
+    return ValidationResult(
+            valid_lf=valid_lf,
+            errors_lf=errors_lf,
+            total_rows=total_rows,
+            error_row_count=error_row_count,
+        )
 
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------
-file_path = "F:\\ITI\\17-Python\\New Project\\FastFeast\\fastfeast-data-pipeline\\data\\input\\batch\\2026-06-17\\customers.csv"
-file_path_json = "F:\\ITI\\17-Python\\New Project\\FastFeast\\fastfeast-data-pipeline\\data\\input\\stream\\2026-06-18\\20\\orders.json"
+# file_path = "F:\\ITI\\17-Python\\New Project\\FastFeast\\fastfeast-data-pipeline\\data\\input\\batch\\2026-06-17\\customers.csv"
+# file_path_json = "F:\\ITI\\17-Python\\New Project\\FastFeast\\fastfeast-data-pipeline\\data\\input\\stream\\2026-06-18\\20\\orders.json"
 
-with open(metadata_path, 'r') as f:
-    md = yaml.safe_load(f)
-validation_cols = md["Batch"]["customers"]["data_types"].keys()
-dynamic_overrides = {col_nm: pl.String for col_nm in validation_cols}
+# md = load_metadata()
+# validation_cols = md["Batch"]["customers"]["data_types"].keys()
+# dynamic_overrides = {col_nm: pl.String for col_nm in validation_cols}
 
 # ----------------------------- CSVS -----------------------------
-lf = pl.scan_csv(file_path, schema_overrides=dynamic_overrides).with_row_index("row_number")
+# lf = pl.scan_csv(file_path, schema_overrides=dynamic_overrides).with_row_index("row_number")
 # print(lf.collect())
 
 
@@ -67,4 +87,71 @@ lf = pl.scan_csv(file_path, schema_overrides=dynamic_overrides).with_row_index("
 # print( lf.filter(pl.col("order_id") == order_id).collect() )
 
 # ----------------------------------------------------------------------------------------
-process_data(lf, "Batch", "customers")
+# validate_file(lf, "Batch", "customers")
+
+
+# =====================================================================================================
+# import polars as pl
+# from pathlib import Path
+# from dataclasses import dataclass
+# from config.config_loader import load_config_tables
+# from validation.validators import (
+#     null_validator,
+#     duplicate_validator,
+#     data_type_validator,
+#     range_validator,
+#     regex_validator,
+#     allowed_values_validator,
+#     empty_errors,
+# )
+
+# root = Path(__file__).resolve().parent.parent
+# sys.path.insert(0, str(root))
+
+# RULES = {
+#     "not_null": null_validator,
+#     "unique": duplicate_validator,
+#     "data_types": data_type_validator,
+#     "range": range_validator,
+#     "regex": regex_validator,
+#     "allowed_values": allowed_values_validator,
+# }
+
+
+# @dataclass
+# class ValidationResult:
+#     valid_lf: pl.LazyFrame
+#     errors_lf: pl.LazyFrame
+#     total_rows: int
+#     error_row_count: int
+
+
+# def validate_file(lf: pl.LazyFrame, layer: str, source_table: str) -> ValidationResult:
+
+#     metadata = load_config_tables()
+#     layer_key = layer.strip().title()
+
+#     table_rules = metadata[layer_key][source_table]
+ 
+#     error_frames = [empty_errors()]
+#     for rule_key, validator_fn in RULES.items():
+#         if rule_key not in table_rules:
+#             continue
+#         error_frames.append(validator_fn(lf, table_rules[rule_key]))
+
+#     errors_lf = pl.concat(error_frames)
+
+
+#     bad_row_numbers = errors_lf.select("row_number").unique()
+
+#     valid_lf = lf.join(bad_row_numbers, on="row_number", how="anti")
+
+#     total_rows = lf.select(pl.len()).collect().item()
+#     error_row_count = bad_row_numbers.select(pl.len()).collect().item()
+#     print(f"[{source_table}] Validation complete: {error_row_count} errors out of {total_rows} rows.")
+#     return ValidationResult(
+#         valid_lf=valid_lf,
+#         errors_lf=errors_lf,
+#         total_rows=total_rows,
+#         error_row_count=error_row_count,
+#     )

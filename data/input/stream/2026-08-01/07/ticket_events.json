@@ -1,0 +1,182 @@
+[
+  {
+    "event_id": "ce1dfbb2-e6f0-406c-93ec-702d6c6252e4",
+    "ticket_id": "2f4d4bac-0912-436e-8deb-0aa1982b1d42",
+    "agent_id": 28,
+    "event_ts": "2026-08-01 09:00:50",
+    "old_status": NaN,
+    "new_status": "Open",
+    "notes": "Ticket created"
+  },
+  {
+    "event_id": "ecb08049-453f-42dc-94aa-654e68e07936",
+    "ticket_id": "2f4d4bac-0912-436e-8deb-0aa1982b1d42",
+    "agent_id": 28,
+    "event_ts": "2026-08-01 09:01:23",
+    "old_status": "Open",
+    "new_status": "InProgress",
+    "notes": "Agent responded"
+  },
+  {
+    "event_id": "12c92faa-2c29-4931-9164-35113a7a6361",
+    "ticket_id": "2f4d4bac-0912-436e-8deb-0aa1982b1d42",
+    "agent_id": 28,
+    "event_ts": "2026-08-01 09:54:50",
+    "old_status": "InProgress",
+    "new_status": "Closed",
+    "notes": "Ticket closed"
+  },
+  {
+    "event_id": "fe45d342-7b72-43d4-9bf5-07ad3c785731",
+    "ticket_id": "2c752693-7d8b-4018-8ef3-6637ab6b2b2c",
+    "agent_id": 5,
+    "event_ts": "2026-08-01 08:23:09",
+    "old_status": NaN,
+    "new_status": "Open",
+    "notes": "Ticket created"
+  },
+  {
+    "event_id": "3ee28c15-e3db-4563-bf93-34289b162f7e",
+    "ticket_id": "2c752693-7d8b-4018-8ef3-6637ab6b2b2c",
+    "agent_id": 5,
+    "event_ts": "2026-08-01 08:23:42",
+    "old_status": "Open",
+    "new_status": "InProgress",
+    "notes": "Agent responded"
+  },
+  {
+    "event_id": "306f945c-cd8f-4f67-99e3-247c7738a5c2",
+    "ticket_id": "2c752693-7d8b-4018-8ef3-6637ab6b2b2c",
+    "agent_id": 5,
+    "event_ts": "2026-08-01 08:37:09",
+    "old_status": "InProgress",
+    "new_status": "Resolved",
+    "notes": "Ticket resolved"
+  },
+  {
+    "event_id": "75de295f-ccc4-49c3-b007-32a0e45d354b",
+    "ticket_id": "2c752693-7d8b-4018-8ef3-6637ab6b2b2c",
+    "agent_id": 5,
+    "event_ts": "2026-08-01 11:08:09",
+    "old_status": "Resolved",
+    "new_status": "Reopened",
+    "notes": "Customer reported issue not resolved"
+  },
+  {
+    "event_id": "9106466f-9a5a-4353-889c-90263ee15d42",
+    "ticket_id": "2c752693-7d8b-4018-8ef3-6637ab6b2b2c",
+    "agent_id": 5,
+    "event_ts": "2026-08-01 11:55:09",
+    "old_status": "Reopened",
+    "new_status": "Resolved",
+    "notes": "Issue finally resolved"
+  },
+  {
+    "event_id": "f8aef70f-b597-4934-8b14-59f8795bc95a",
+    "ticket_id": "2efee716-8720-4a50-b93d-b769c30bc6c6",
+    "agent_id": 7,
+    "event_ts": "2026-08-01 09:41:10",
+    "old_status": NaN,
+    "new_status": "Open",
+    "notes": "Ticket created"
+  },
+  {
+    "event_id": "93656a45-186f-4fe8-82ba-3c46c4d00ac5",
+    "ticket_id": "2efee716-8720-4a50-b93d-b769c30bc6c6",
+    "agent_id": 7,
+    "event_ts": "2026-08-01 09:41:41",
+    "old_status": "Open",
+    "new_status": "InProgress",
+    "notes": "Agent responded"
+  },
+  {
+    "event_id": "9f39eaed-a4dd-4136-b7c8-0a4a98e0e6d1",
+    "ticket_id": "2efee716-8720-4a50-b93d-b769c30bc6c6",
+    "agent_id": 7,
+    "event_ts": "2026-08-01 09:49:10",
+    "old_status": "InProgress",
+    "new_status": "Closed",
+    "notes": "Ticket closed"
+  },
+  {
+    "event_id": "114fe5d1-9b13-46e2-abe1-d962fdf4e149",
+    "ticket_id": "44f096d5-da28-4404-bbee-943e216b79e5",
+    "agent_id": 12,
+    "event_ts": "2026-08-01 08:32:41",
+    "old_status": NaN,
+    "new_status": "Open",
+    "notes": "Ticket created"
+  },
+  {
+    "event_id": "2c34b18c-baa5-4867-a2df-a9a69c25cf28",
+    "ticket_id": "44f096d5-da28-4404-bbee-943e216b79e5",
+    "agent_id": 12,
+    "event_ts": "2026-08-01 08:33:33",
+    "old_status": "Open",
+    "new_status": "InProgress",
+    "notes": "Agent responded"
+  },
+  {
+    "event_id": "a2b49d9d-b3d4-4c34-a031-0edd6a9163de",
+    "ticket_id": "44f096d5-da28-4404-bbee-943e216b79e5",
+    "agent_id": 12,
+    "event_ts": "2026-08-01 08:39:41",
+    "old_status": "InProgress",
+    "new_status": "Resolved",
+    "notes": "Ticket resolved"
+  },
+  {
+    "event_id": "f2261d3f-aa32-4c7f-ad2a-34a1267e0eab",
+    "ticket_id": "d4586f41-5fa1-47a3-9eed-48481c6796d2",
+    "agent_id": 3,
+    "event_ts": "2026-08-01 07:48:51",
+    "old_status": NaN,
+    "new_status": "Open",
+    "notes": "Ticket created"
+  },
+  {
+    "event_id": "5dbbf572-ec4c-4b0d-a783-6925e20f156e",
+    "ticket_id": "d4586f41-5fa1-47a3-9eed-48481c6796d2",
+    "agent_id": 3,
+    "event_ts": "2026-08-01 07:49:14",
+    "old_status": "Open",
+    "new_status": "InProgress",
+    "notes": "Agent responded"
+  },
+  {
+    "event_id": "72593006-c966-4894-af3b-995ae7680608",
+    "ticket_id": "d4586f41-5fa1-47a3-9eed-48481c6796d2",
+    "agent_id": 3,
+    "event_ts": "2026-08-01 08:40:51",
+    "old_status": "InProgress",
+    "new_status": "Resolved",
+    "notes": "Ticket resolved"
+  },
+  {
+    "event_id": "36d760b8-fcae-4145-bdfe-a580b407244b",
+    "ticket_id": "bf85053e-1c91-4c12-9a2e-b515f3ea14fb",
+    "agent_id": 16,
+    "event_ts": "2026-08-01 08:25:06",
+    "old_status": NaN,
+    "new_status": "Open",
+    "notes": "Ticket created"
+  },
+  {
+    "event_id": "43c8edc2-1560-4118-b8f8-fb75e9dcdbc6",
+    "ticket_id": "bf85053e-1c91-4c12-9a2e-b515f3ea14fb",
+    "agent_id": 16,
+    "event_ts": "2026-08-01 08:29:14",
+    "old_status": "Open",
+    "new_status": "InProgress",
+    "notes": "Agent responded"
+  },
+  {
+    "event_id": "ba8e885e-cc29-4bb3-834c-50f9459c62ea",
+    "ticket_id": "bf85053e-1c91-4c12-9a2e-b515f3ea14fb",
+    "agent_id": 16,
+    "event_ts": "2026-08-01 08:33:14",
+    "old_status": "InProgress",
+    "new_status": "Closed",
+    "notes": "Ticket closed"
+  }
+]

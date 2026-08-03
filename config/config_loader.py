@@ -3,6 +3,7 @@ import yaml
 
 # ---------------------------------- LOADING CONFIG ----------------------------------
 default_config_path = os.path.join(os.path.dirname(__file__), 'config.yaml')
+default_config_path_tables = os.path.join(os.path.dirname(__file__), 'tables_metadata.yaml')
 
 config = None
 
@@ -47,5 +48,5 @@ def load_metadata(path = None):
 
     if path is not None:
         cfg = metdata
-    
+
     return cfg
