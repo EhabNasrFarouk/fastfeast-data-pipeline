@@ -26,7 +26,6 @@ def batch_ingest(pipeline_mng, config=None):
     # Getting unprocessed files.
     files_paths = [ os.path.join(batch_path, f) for f in os.listdir(batch_path) ]
     batch_files = get_unprocessed_files(files_paths, batch_date)
-    print("Hello")
     # Passing the files to the thread pool.
     for f in batch_files:
         pipeline_mng.submit_file(run_id, f, "Batch", batch_date)

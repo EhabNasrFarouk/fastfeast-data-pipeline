@@ -1,6 +1,5 @@
 import polars as pl
 import sys
-import json
 from pathlib import Path
 
 root = Path(__file__).resolve().parent.parent
@@ -30,6 +29,7 @@ def handle_error(run_id: str, source_table: str, error_msg):
 
 def read_file(file_path: str, run_id: str, source_table: str) -> pl.LazyFrame | None:
     path = Path(file_path)
+    print(f"Parsing Phase for {source_table} table.", "\n------------------------------------\n")
 
     # Getting the table columns from the metadata file.
     file_type = "Stream" if source_table in ["orders", "tickets", "ticket_events"] else "Batch"
@@ -67,7 +67,7 @@ def read_file(file_path: str, run_id: str, source_table: str) -> pl.LazyFrame | 
 
 
 # ------------------------------- TESTING -------------------------------
-# lf = read_file("F:\\ITI\\17-Python\\New Project\\FastFeast\\fastfeast-data-pipeline\\data\\input\\stream\\2026-06-18\\13\\orders.json", "3d56aafc-36f4-4d09-95d5-d871229ac81f", "orders")
+# lf = read_file("F:\\ITI\\17-Python\\New Project\\FastFeast\\fastfeast-data-pipeline\\data\\input\\stream\\2026-06-18\\13\\ticket_events.json", "3d56aafc-36f4-4d09-95d5-d871229ac81f", "ticket_events")
 # print(lf.collect())
 # print(lf)
 # handle_error("3d56aafc-36f4-4d09-95d5-d871229ac81f", "orders", "ERROR!")

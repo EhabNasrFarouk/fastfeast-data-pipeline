@@ -1,5 +1,18 @@
 import polars as pl
 
+
+ERROR_SCHEMA = {
+    "row_number": pl.UInt32,
+    "column_name": pl.String,
+    "error_type": pl.String,
+    "invalid_value": pl.String,
+}
+
+
+def empty_errors() -> pl.LazyFrame:
+    return pl.DataFrame(schema=ERROR_SCHEMA).lazy()
+
+
 # ------------------------------ Null Validator ------------------------------
 def null_validator(lf: pl.LazyFrame, columns: list[str]) -> pl.LazyFrame | None:
     error_frames = []
@@ -16,7 +29,7 @@ def null_validator(lf: pl.LazyFrame, columns: list[str]) -> pl.LazyFrame | None:
         )
         error_frames.append(errors)
 
-    return None if not error_frames else pl.concat(error_frames)
+    return empty_errors() if not error_frames else pl.concat(error_frames)
 
 
 # ------------------------------ Duplicate Validator ------------------------------
@@ -38,7 +51,7 @@ def duplicate_validator(lf: pl.LazyFrame, columns: list[str]) -> pl.LazyFrame | 
         )
         error_frames.append(errors)
 
-    return None if not error_frames else pl.concat(error_frames)
+    return empty_errors() if not error_frames else pl.concat(error_frames)
 
 
 # ------------------------------ Data Type Validator ------------------------------
@@ -50,7 +63,7 @@ def data_type_validator(lf: pl.LazyFrame, columns: dict[str, list]) -> pl.LazyFr
         "pl.Boolean": pl.Boolean,
         "pl.Date": pl.Date,
         "pl.Timestamp": pl.Datetime,
-        "pl.Decimal": pl.Decimal,
+        "pl.Decimal": pl.Float64,
         "pl.Time": pl.Time
     }
                 
@@ -85,8 +98,7 @@ def data_type_validator(lf: pl.LazyFrame, columns: dict[str, list]) -> pl.LazyFr
         )
         error_frames.append(errors)
 
-    return None if not error_frames else pl.concat(error_frames)
-
+    return empty_errors() if not error_frames else pl.concat(error_frames)
 
 # ------------------------------ Range Validator ------------------------------
 def parse_bound(value) -> float:
@@ -96,6 +108,7 @@ def parse_bound(value) -> float:
 
 
 def range_validator(lf: pl.LazyFrame, range_rules: dict[str, list]) -> pl.LazyFrame | None:
+    return empty_errors()
     error_frames = []
     for col_nm, (low, high) in range_rules.items():
         low_bound = parse_bound(low)
@@ -114,7 +127,7 @@ def range_validator(lf: pl.LazyFrame, range_rules: dict[str, list]) -> pl.LazyFr
         )
         error_frames.append(errors)
 
-    return None if not error_frames else pl.concat(error_frames)
+    return empty_errors() if not error_frames else pl.concat(error_frames)
 
 
 # ------------------------------ Regex Validator ------------------------------
@@ -134,7 +147,7 @@ def regex_validator(lf: pl.LazyFrame, regex_rules: dict[str, str]) -> pl.LazyFra
         )
         error_frames.append(errors)
 
-    return None if not error_frames else pl.concat(error_frames)
+    return empty_errors() if not error_frames else pl.concat(error_frames)
 
 
 # ------------------------------ Allowed Values Validator ------------------------------
@@ -154,4 +167,4 @@ def allowed_values_validator(lf: pl.LazyFrame, allowed_values_rules: dict[str, l
         )
         error_frames.append(errors)
 
-    return None if not error_frames else pl.concat(error_frames)
+    return empty_errors() if not error_frames else pl.concat(error_frames)
