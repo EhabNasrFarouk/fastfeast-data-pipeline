@@ -220,6 +220,7 @@ Stream:
     not_null: [order_id, customer_id, restaurant_id, driver_id, region_id, order_status, payment_method, order_amount, delivery_fee, discount_amount, total_amount, order_created_at, delivered_at]
     
     data_types:
+      date_format: "%Y-%m-%d %H:%M:%S"
       order_id: pl.Utf8
       customer_id: pl.Int64
       restaurant_id: pl.Int64
@@ -253,6 +254,8 @@ Stream:
     not_null: [ticket_id, order_id, customer_id, agent_id, reason_id, priority_id, channel_id, status, created_at]
     
     data_types:
+      float_to_int: True
+      date_format: "%Y-%m-%d %H:%M:%S"
       ticket_id: pl.Utf8
       order_id: pl.Utf8
       customer_id: pl.Int64
@@ -287,6 +290,7 @@ Stream:
     not_null: [event_id, ticket_id, agent_id, event_ts, new_status]
     
     data_types:
+      date_format: "%Y-%m-%d %H:%M:%S"
       event_id: pl.Utf8
       ticket_id: pl.Utf8
       agent_id: pl.Int64

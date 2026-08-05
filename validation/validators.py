@@ -66,23 +66,42 @@ def data_type_validator(lf: pl.LazyFrame, columns: dict[str, list]) -> pl.LazyFr
         "pl.Decimal": pl.Float64,
         "pl.Time": pl.Time
     }
-                
+
+    date_format = "%m/%d/%Y %H:%M"
+    float_to_int = False
     for col_nm, data_type in columns.items():
+        # Handling date formats & converting from float to int
+        if col_nm == "date_format":
+            date_format = data_type
+            continue
+        elif col_nm == "float_to_int":
+            float_to_int = True
+            continue
+
+
+        # ----------------------------------------------------------------------------
         target_type = STR_TO_DTYPE[data_type]
         parsed_expr = pl.col(col_nm).cast(STR_TO_DTYPE[data_type], strict=False)
-        # print(target_type)
 
         if target_type == pl.Date:
             parsed_expr = pl.col(col_nm).str.to_date("%m/%d/%Y", strict=False)
-            # print(col_nm, data_type)
 
         elif target_type == pl.Datetime:
-            parsed_expr = pl.col(col_nm).str.to_datetime("%m/%d/%Y %H:%M", strict=False)
-            # print(col_nm, data_type)
+            parsed_expr = pl.col(col_nm).str.to_datetime(date_format, strict=False)
 
         elif target_type == pl.Time:
-                parsed_expr = pl.col(col_nm).str.replace(r"\.[0-9]$", "").str.to_time("%H:%M", strict=False)
-                # print(col_nm, data_type)
+            parsed_expr = pl.col(col_nm).str.replace(r"\.[0-9]$", "").str.to_time("%H:%M", strict=False)
+
+        elif target_type == pl.Int64 and float_to_int:
+            parsed_expr = pl.col(col_nm).cast(pl.Float64).cast(pl.Int64, strict=False)
+
+        elif target_type == pl.Boolean:
+            lc = pl.col(col_nm).str.to_lowercase().str.strip_chars()
+            parsed_expr = (
+                pl.when(lc.is_in(["true", "1", "yes", "t", "y"])).then(pl.lit(True))
+                .when(lc.is_in(["false", "0", "no", "f", "n"])).then(pl.lit(False))
+                .otherwise(None)
+            )
         
         errors = (
             lf.filter(
@@ -108,7 +127,6 @@ def parse_bound(value) -> float:
 
 
 def range_validator(lf: pl.LazyFrame, range_rules: dict[str, list]) -> pl.LazyFrame | None:
-    return empty_errors()
     error_frames = []
     for col_nm, (low, high) in range_rules.items():
         low_bound = parse_bound(low)
@@ -116,7 +134,7 @@ def range_validator(lf: pl.LazyFrame, range_rules: dict[str, list]) -> pl.LazyFr
 
         errors = (
             lf.filter(
-                ((pl.col(col_nm) < low_bound) | (pl.col(col_nm) > high_bound))
+                ((pl.col(col_nm).cast(pl.Float64) < low_bound) | (pl.col(col_nm).cast(pl.Float64) > high_bound))
             )
             .select(
                 "row_number",

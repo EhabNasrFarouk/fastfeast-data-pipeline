@@ -46,49 +46,73 @@ def validate_file(lf: pl.LazyFrame, file_type: str, source_table: str) -> Valida
         error_frames.append(validator_fn(lf, table_rules[rule_key]))
 
     errors_lf = pl.concat(error_frames)
-
-    errors_lf = pl.concat(error_frames)
+    lf.collect().write_csv(f"data/validation/{source_table}.csv")
+    errors_lf.collect().write_csv(f"data/validation/{source_table}_errors2.csv")
     
-    bad_row_numbers = errors_lf.select("row_number").unique()
+    # bad_row_numbers = errors_lf.select("row_number").unique()
 
-    valid_lf = lf.join(bad_row_numbers, on="row_number", how="anti")
+    # valid_lf = lf.join(bad_row_numbers, on="row_number", how="anti")
 
-    total_rows = lf.select(pl.len()).collect().item()
-    error_row_count = bad_row_numbers.select(pl.len()).collect().item()
-    print(f"[{source_table}] Validation complete: {error_row_count} errors out of {total_rows} rows.")
+    # total_rows = lf.select(pl.len()).collect().item()
+    # error_row_count = bad_row_numbers.select(pl.len()).collect().item()
+    # print(f"[{source_table}] Validation complete: {error_row_count} errors out of {total_rows} rows.")
 
-    return ValidationResult(
-            valid_lf=valid_lf,
-            errors_lf=errors_lf,
-            total_rows=total_rows,
-            error_row_count=error_row_count,
-        )
+    # return ValidationResult(
+    #         valid_lf=valid_lf,
+    #         errors_lf=errors_lf,
+    #         total_rows=total_rows,
+    #         error_row_count=error_row_count,
+    #     )
 
 
 # -------------------------------------------------------------------------------------------------------------------------------------------------
 # file_path = "F:\\ITI\\17-Python\\New Project\\FastFeast\\fastfeast-data-pipeline\\data\\input\\batch\\2026-06-17\\customers.csv"
-# file_path_json = "F:\\ITI\\17-Python\\New Project\\FastFeast\\fastfeast-data-pipeline\\data\\input\\stream\\2026-06-18\\20\\orders.json"
+# file_path_json = "F:\\ITI\\17-Python\\New Project\\FastFeast\\fastfeast-data-pipeline\\data\\input\\stream\\2026-06-18\\17\\orders.json"
 
 # md = load_metadata()
-# validation_cols = md["Batch"]["customers"]["data_types"].keys()
+# validation_cols = md["Stream"]["orders"]["data_types"].keys()
 # dynamic_overrides = {col_nm: pl.String for col_nm in validation_cols}
 
 # ----------------------------- CSVS -----------------------------
-# lf = pl.scan_csv(file_path, schema_overrides=dynamic_overrides).with_row_index("row_number")
+# file_path = "F:\\ITI\\17-Python\\New Project\\FastFeast\\Integration\\fastfeast-data-pipeline\\data\\input\\stream\\2026-06-14\\21\\tickets.csv"
+# validation_cols = md["Stream"]["tickets"]["data_types"].keys()
+
+# excluded = ["date_format", "float_to_int"]
+# dynamic_overrides = {col_nm: pl.String for col_nm in validation_cols if col_nm not in excluded}
+# lf = pl.scan_csv(file_path, schema_overrides=dynamic_overrides)
+
+# lf = lf.with_columns([
+#     pl.col(col_name).str.strip_chars() for col_name in dynamic_overrides.keys()
+# ])
+
+# lf = lf.with_row_index("row_number")
+
+# validate_file(lf, "Stream", "tickets")
 # print(lf.collect())
 
-
 # ----------------------------- JSON -----------------------------
+# file_path_json = "F:\\ITI\\17-Python\\New Project\\FastFeast\\Integration\\fastfeast-data-pipeline\\data\\input\\stream\\2026-06-14\\21\\orders.json"
+# validation_cols = md["Stream"]["orders"]["data_types"].keys()
+# dynamic_overrides = {col_nm: pl.String for col_nm in validation_cols if col_nm != "date_format"}
+
 # with open(file_path_json) as f: # This is to handle NaN problem.
 #     clean_json_str = f.read().replace("NaN", "null")
 
-# lf = pl.read_json(clean_json_str.encode()).lazy().with_row_index("row_number")
-# order_id = "392d6248-2aaf-40b7-9759-f534403a7fc8"
-# print( lf.filter(pl.col("order_id") == order_id).collect() )
+# lf = (
+#     pl.read_json(clean_json_str.encode(), schema_overrides=dynamic_overrides)
+#     .lazy()
+# )
 
-# ----------------------------------------------------------------------------------------
-# validate_file(lf, "Batch", "customers")
+# lf = lf.with_columns([
+#     pl.col(col_name).str.strip_chars() for col_name in dynamic_overrides.keys()
+# ])
 
+# lf = lf.with_row_index("row_number")
+
+# validate_file(lf, "Stream", "orders")
+
+# print(lf.filter( (pl.col("row_number") == 85) | (pl.col("row_number") == 131) ).collect())
+# print(lf.filter( pl.col("order_created_at").is_null() ).collect())
 
 # =====================================================================================================
 # import polars as pl

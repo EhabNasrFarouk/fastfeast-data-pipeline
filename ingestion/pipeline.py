@@ -30,14 +30,14 @@ def process_file(run_id: str, file_path: str, file_type: str, run_date: date, ru
 
     # Validation Part
     try:
-        v_rs = validate_file(lf, file_type, source_table)
+        validate_file(lf, file_type, source_table)
         print(f"Validating Phase completed for {source_table} table.", "\n------------------------------------\n")
     except Exception as e:
         print(e)
     
     # Creating the file
     # write_validation(v_rs.errors_lf, run_id, file_path, file_type, source_table)
-    try:
-        v_rs.errors_lf.collect().write_csv(f"{source_table}.csv")
-    except Exception as e:
-        print(e)
+    # try:
+    #     v_rs.errors_lf.collect().write_csv(f"{source_table}.csv")
+    # except Exception as e:
+    #     print(e)
