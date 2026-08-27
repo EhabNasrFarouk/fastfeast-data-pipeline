@@ -1,4 +1,5 @@
 import polars as pl
+from streamlit import columns
 
 
 ERROR_SCHEMA = {
@@ -6,6 +7,7 @@ ERROR_SCHEMA = {
     "column_name": pl.String,
     "error_type": pl.String,
     "invalid_value": pl.String,
+    "severity": pl.String,
 }
 
 
@@ -14,17 +16,18 @@ def empty_errors() -> pl.LazyFrame:
 
 
 # ------------------------------ Null Validator ------------------------------
-def null_validator(lf: pl.LazyFrame, columns: list[str]) -> pl.LazyFrame | None:
+def null_validator(lf: pl.LazyFrame, not_null_rules: dict[str, str]) -> pl.LazyFrame | None:
     error_frames = []
       
-    for col_nm in columns:
+    for col_nm , severity in not_null_rules.items():
         errors = (
             lf.filter(pl.col(col_nm).is_null())
                 .select(
                     "row_number",
                     pl.lit(col_nm).alias("column_name"),
                     pl.lit("NULL_VALUE").alias("error_type"),
-                    pl.col(col_nm).cast(pl.String).alias("invalid_value")
+                    pl.col(col_nm).cast(pl.String).alias("invalid_value"),
+                    pl.lit(severity).alias("severity"),
                 )
         )
         error_frames.append(errors)
@@ -46,7 +49,8 @@ def duplicate_validator(lf: pl.LazyFrame, columns: list[str]) -> pl.LazyFrame | 
                     "row_number",
                     pl.lit(col_nm).alias("column_name"),
                     pl.lit("DUPLICATE_KEY").alias("error_type"),
-                    pl.col(col_nm).cast(pl.String).alias("invalid_value")
+                    pl.col(col_nm).cast(pl.String).alias("invalid_value"),
+                    pl.lit("CRITICAL").alias("severity"),
                 )
         )
         error_frames.append(errors)
@@ -112,7 +116,8 @@ def data_type_validator(lf: pl.LazyFrame, columns: dict[str, list]) -> pl.LazyFr
                     "row_number",
                     pl.lit(col_nm).alias("column_name"),
                     pl.lit("INVALID_DTYPE").alias("error_type"),
-                    pl.col(col_nm).cast(pl.String).alias("invalid_value")
+                    pl.col(col_nm).cast(pl.String).alias("invalid_value"),
+                    pl.lit("CRITICAL").alias("severity"),
                 )
         )
         error_frames.append(errors)
@@ -128,9 +133,10 @@ def parse_bound(value) -> float:
 
 def range_validator(lf: pl.LazyFrame, range_rules: dict[str, list]) -> pl.LazyFrame | None:
     error_frames = []
-    for col_nm, (low, high) in range_rules.items():
-        low_bound = parse_bound(low)
-        high_bound = parse_bound(high)
+    for col_nm, rules in range_rules.items():
+        low_bound = parse_bound(rules[0])
+        high_bound = parse_bound(rules[1])
+        severity = rules[2]
 
         errors = (
             lf.filter(
@@ -141,6 +147,7 @@ def range_validator(lf: pl.LazyFrame, range_rules: dict[str, list]) -> pl.LazyFr
                 pl.lit(col_nm).alias("column_name"),
                 pl.lit("OUT_OF_RANGE").alias("error_type"),
                 pl.col(col_nm).cast(pl.String).alias("invalid_value"),
+                pl.lit(severity).alias("severity"),
             )
         )
         error_frames.append(errors)
@@ -161,6 +168,7 @@ def regex_validator(lf: pl.LazyFrame, regex_rules: dict[str, str]) -> pl.LazyFra
                 pl.lit(col_nm).alias("column_name"),
                 pl.lit("REGEX_MISMATCH").alias("error_type"),
                 pl.col(col_nm).cast(pl.String).alias("invalid_value"),
+                pl.lit("WARNING").alias("severity"),
             )
         )
         error_frames.append(errors)
@@ -181,6 +189,7 @@ def allowed_values_validator(lf: pl.LazyFrame, allowed_values_rules: dict[str, l
                 pl.lit(col_nm).alias("column_name"),
                 pl.lit("INVALID_VALUE").alias("error_type"),
                 pl.col(col_nm).cast(pl.String).alias("invalid_value"),
+                pl.lit("WARNING").alias("severity"),
             )
         )
         error_frames.append(errors)

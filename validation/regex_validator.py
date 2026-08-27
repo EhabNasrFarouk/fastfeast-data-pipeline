@@ -14,6 +14,7 @@ def regex_validator(lf: pl.LazyFrame, regex_rules: dict[str, str]) -> pl.LazyFra
                 pl.lit(col_nm).alias("column_name"),
                 pl.lit("REGEX_MISMATCH").alias("error_type"),
                 pl.col(col_nm).cast(pl.String).alias("invalid_value"),
+                pl.lit("WARNING").alias("severity"),
             )
         )
         error_frames.append(errors)
@@ -24,6 +25,7 @@ def regex_validator(lf: pl.LazyFrame, regex_rules: dict[str, str]) -> pl.LazyFra
             pl.lit(None, dtype=pl.String).alias("column_name"),
             pl.lit(None, dtype=pl.String).alias("error_type"),
             pl.lit(None, dtype=pl.String).alias("invalid_value"),
+            pl.lit("WARNING").alias("severity"),
         )
     return pl.concat(error_frames)
 

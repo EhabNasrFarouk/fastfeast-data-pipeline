@@ -23,31 +23,58 @@ RULES = {
 
 @dataclass
 class ValidationResult:
-    valid_lf: pl.LazyFrame
-    errors_lf: pl.LazyFrame
+    valid_lf: pl.LazyFrame          # rows to load (clean + warning-only rows)
+    quarantine_lf: pl.LazyFrame     # rows to quarantine (>=1 CRITICAL error)
+    errors_lf: pl.LazyFrame         # full error log, both severities
     total_rows: int
-    error_row_count: int
+    quarantined_count: int
+    warning_count: int
 
 
 # -------------------------- Main Function --------------------------
 def validate_file(lf: pl.LazyFrame, file_type: str, source_table: str) -> ValidationResult:
-    # print(f"Validating Phase for {source_table} table.", "\n------------------------------------\n")
-
     metadata = load_metadata()
     layer_key = file_type.strip().title()
-
     table_rules = metadata[layer_key][source_table]
- 
+
     error_frames = [empty_errors()]
     for rule_key, validator_fn in RULES.items():
         if rule_key not in table_rules:
             continue
-        
         error_frames.append(validator_fn(lf, table_rules[rule_key]))
 
     errors_lf = pl.concat(error_frames)
-    lf.collect().write_csv(f"data/validation/{source_table}.csv")
-    errors_lf.collect().write_csv(f"data/validation/{source_table}_errors2.csv")
+
+    critical_rows = (
+        errors_lf.filter(pl.col("severity") == "CRITICAL")
+        .select("row_number").unique()
+    )
+
+    quarantine_lf = lf.join(critical_rows, on="row_number", how="semi")
+    valid_lf = lf.join(critical_rows, on="row_number", how="anti")
+
+    total_rows = lf.select(pl.len()).collect().item()
+    quarantined_count = critical_rows.select(pl.len()).collect().item()
+    warning_count = (
+        errors_lf.filter(pl.col("severity") == "WARNING")
+        .select("row_number").unique()
+        .select(pl.len()).collect().item()
+    )
+
+    print(
+        f"[{source_table}] {quarantined_count} quarantined (CRITICAL), "
+        f"{warning_count} loaded-with-warnings, "
+        f"{total_rows - quarantined_count} total will load."
+    )
+
+    return ValidationResult(
+        valid_lf=valid_lf,
+        quarantine_lf=quarantine_lf,
+        errors_lf=errors_lf,
+        total_rows=total_rows,
+        quarantined_count=quarantined_count,
+        warning_count=warning_count,
+    )
     
     # bad_row_numbers = errors_lf.select("row_number").unique()
 
