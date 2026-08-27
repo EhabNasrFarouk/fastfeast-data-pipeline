@@ -477,6 +477,6 @@ file_tracker:
   max_retries:   3
 
 cron:
-  day_of_week: tue
-  hour:        00
-  minute:      42
+  day_of_week: wed
+  hour:        22
+  minute:      59

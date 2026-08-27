@@ -36,8 +36,8 @@ def process_file(run_id: str, file_path: str, file_type: str, run_date: date, ru
         print(e)
     
     # Creating the file
-    # write_validation(v_rs.errors_lf, run_id, file_path, file_type, source_table)
-    try:
-        v_rs.errors_lf.collect().write_csv(f"{source_table}.csv")
-    except Exception as e:
-        print(e)
+    write_validation(v_rs.errors_lf, run_id, file_path, file_type, source_table)
+    # try:
+    #     v_rs.errors_lf.collect().write_csv(f"{source_table}.csv")
+    # except Exception as e:
+    #     print(e)

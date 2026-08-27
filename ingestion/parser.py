@@ -34,7 +34,8 @@ def read_file(file_path: str, run_id: str, source_table: str) -> pl.LazyFrame | 
     # Getting the table columns from the metadata file.
     file_type = "Stream" if source_table in ["orders", "tickets", "ticket_events"] else "Batch"
     columns = load_metadata()[file_type][source_table]["data_types"].keys()
-    dynamic_overrides = {col_nm: pl.String for col_nm in columns}
+    excluded = ["date_format", "float_to_int"]
+    dynamic_overrides = {col_nm: pl.String for col_nm in columns if col_nm not in excluded}
 
     try:
         match path.suffix.lower():

@@ -1,7 +1,15 @@
 Batch:
 
   customers:
-      not_null:  [customer_id, segment_id, phone, gender, region_id, signup_date]
+      not_null:
+        customer_id:  CRITICAL   
+        region_id:    CRITICAL   
+        signup_date:  CRITICAL   
+        full_name:    CRITICAL  
+        segment_id:   WARNING   
+        phone:        WARNING   
+        gender:       WARNING    
+        email:        WARNING    
 
       data_types:
         customer_id:  pl.Int64
@@ -12,8 +20,8 @@ Batch:
         segment_id: pl.Int64
         signup_date:  pl.Date
         gender: pl.Utf8
-        created_at: pl.Timestamp
-        updated_at: pl.Time
+        created_at: pl.Timestamp    
+        updated_at: pl.Time   
 
       unique:    [customer_id]
       regex:
@@ -28,7 +36,20 @@ Batch:
         segment_id: segments.segment_id
 
   drivers:
-    not_null: [driver_id, shift, vehicle_type, region_id, national_id, hire_date, rating_avg, on_time_rate, cancel_rate, completed_deliveries, is_active]
+    not_null:
+      driver_id:              CRITICAL 
+      national_id:            CRITICAL  
+      region_id:               CRITICAL  
+      driver_name:              CRITICAL  
+      shift:                    WARNING   
+      vehicle_type:             WARNING   
+      hire_date:                WARNING   
+      driver_phone:              WARNING   
+      rating_avg:                WARNING   
+      on_time_rate:               WARNING   
+      cancel_rate:                 WARNING   
+      completed_deliveries:         WARNING   
+      is_active:                     WARNING   
 
     data_types:
       driver_id:  pl.Int64
@@ -44,15 +65,15 @@ Batch:
       cancel_rate:  pl.Decimal
       completed_deliveries: pl.Int64
       is_active:  pl.Boolean
-      created_at: pl.Timestamp
+      created_at: pl.Timestamp  
       updated_at: pl.Time
 
-    unique:   [driver_id, national_id]
+    unique:   [driver_id, national_id]  
     range:
-      rating_avg:   [1.0, 5.0]
-      on_time_rate: [0.0, 1.0]
-      cancel_rate:  [0.0, 1.0]
-      completed_deliveries: [0, INF]
+      rating_avg:            [1.0, 5.0, WARNING]
+      on_time_rate:          [0.0, 1.0, WARNING]
+      cancel_rate:           [0.0, 1.0, WARNING]
+      completed_deliveries:  [0, INF, WARNING]
     allowed_values:
       shift:        [morning, evening, night]
       vehicle_type: [bike, motorbike, car]
@@ -63,7 +84,15 @@ Batch:
       region_id: regions.region_id
 
   restaurants:
-    not_null: [restaurant_id, restaurant_name, region_id, category_id, price_tier, is_active, rating_avg, prep_time_avg_min]
+    not_null:
+      restaurant_id:      CRITICAL  
+      region_id:            CRITICAL 
+      category_id:            CRITICAL  
+      restaurant_name:          WARNING   
+      price_tier:                 WARNING   
+      is_active:                    WARNING  
+      rating_avg:                     WARNING   
+      prep_time_avg_min:                 WARNING  
 
     data_types:
       restaurant_id:  pl.Int64
@@ -74,13 +103,13 @@ Batch:
       rating_avg: pl.Decimal
       prep_time_avg_min:  pl.Int64
       is_active:  pl.Boolean
-      created_at: pl.Timestamp
-      updated_at: pl.Timestamp
+      created_at: pl.Timestamp  
+      updated_at: pl.Timestamp  
 
     unique:   [restaurant_id]
     range:
-      rating_avg: [1.0, 5.0]
-      prep_time_avg_min: [0, INF]
+      rating_avg:         [1.0, 5.0, WARNING]
+      prep_time_avg_min:  [0, INF, WARNING]
     allowed_values:
       price_tier: [Low, Mid, High]
     foreign_keys:
@@ -88,8 +117,19 @@ Batch:
       category_id: categories.category_id
 
   agents:
-    not_null: [agent_id, agent_phone, skill_level, team_id, is_active, hire_date, avg_handle_time_min, resolution_rate, csat_score]
-    
+    not_null:
+      agent_id:                CRITICAL  
+      team_id:                   CRITICAL  
+      agent_name:                  CRITICAL  
+      agent_phone:                  WARNING   
+      agent_email:                    WARNING  
+      skill_level:                    WARNING  
+      is_active:                        WARNING   
+      hire_date:                          WARNING  
+      avg_handle_time_min:                  WARNING   
+      resolution_rate:                        WARNING   
+      csat_score:                               WARNING   
+
     data_types:
       agent_id: pl.Int64
       agent_name: pl.Utf8
@@ -102,38 +142,45 @@ Batch:
       resolution_rate:  pl.Decimal
       csat_score: pl.Decimal
       is_active:  pl.Boolean
-      created_at: pl.Timestamp
-      updated_at: pl.Time
-
+      created_at: pl.Timestamp  
+      updated_at: pl.Time   
 
     unique:   [agent_id]
 
     range:
-      avg_handle_time_min: [0, INF]
-      resolution_rate: [0.0, 1.0]
-      csat_score: [0.0, 5.0]
+      avg_handle_time_min: [0, INF, WARNING]
+      resolution_rate:     [0.0, 1.0, WARNING]
+      csat_score:           [0.0, 5.0, WARNING]
 
     allowed_values:
       skill_level: [Junior, Mid, Senior, Lead]
 
     regex:
       agent_email: '^[^@\s]+@[^@\s]+\.[^@\s]+$'
-      agent_phone: '^1[0-25][0-9]{8}$' # It starts with 1
+      agent_phone: '^1[0-25][0-9]{8}$'
 
     foreign_keys:
       team_id: teams.team_id
 
   cities:
-    not_null: [city_id, city_name, country, timezone]
+    not_null:
+      city_id:    CRITICAL
+      city_name:  CRITICAL
+      country:    CRITICAL
+      timezone:   CRITICAL
     unique: [city_id]
     data_types:
       city_id:  pl.Int64
       city_name:  pl.Utf8
       country:  pl.Utf8
       timezone: pl.Utf8
-      
+
   regions:
-    not_null: [region_id, region_name, city_id, delivery_base_fee]
+    not_null:
+      region_id:           CRITICAL
+      region_name:         CRITICAL
+      city_id:             CRITICAL
+      delivery_base_fee:   CRITICAL
     unique: [region_id]
     data_types:
       region_id: pl.Int64
@@ -141,26 +188,35 @@ Batch:
       city_id: pl.Int64
       delivery_base_fee: pl.Decimal
     range:
-      delivery_base_fee: [0.0, 200]
+      delivery_base_fee: [0.0, 200, CRITICAL]
     foreign_keys:
       city_id: cities.city_id
 
   categories:
-    not_null: [category_id, category_name]
+    not_null:
+      category_id:    CRITICAL
+      category_name:  CRITICAL
     unique: [category_id]
     data_types:
       category_id: pl.Int64
       category_name: pl.Utf8
 
   reason_categories:
-    not_null: [reason_category_id, category_name]
+    not_null:
+      reason_category_id:  CRITICAL
+      category_name:       CRITICAL
     unique: [reason_category_id]
     data_types:
       reason_category_id: pl.Int64
       category_name: pl.Utf8
 
   reasons:
-    not_null: [reason_id, reason_name, reason_category_id, severity_level, typical_refund_pct]
+    not_null:
+      reason_id:            CRITICAL
+      reason_name:          CRITICAL
+      reason_category_id:   CRITICAL
+      severity_level:       CRITICAL
+      typical_refund_pct:   CRITICAL
     unique: [reason_id]
     data_types:
       reason_id: pl.Int64
@@ -169,13 +225,17 @@ Batch:
       severity_level: pl.Int64
       typical_refund_pct: pl.Decimal
     range:
-      severity_level: [1, 5]
-      typical_refund_pct: [0.0, 1.0]
+      severity_level:       [1, 5, WARNING]
+      typical_refund_pct:   [0.0, 1.0, WARNING]
     foreign_keys:
       reason_category_id: reason_categories.reason_category_id
 
   segments:
-    not_null: [segment_id, segment_name, discount_pct, priority_support]
+    not_null:
+      segment_id:         CRITICAL
+      segment_name:       CRITICAL
+      discount_pct:       CRITICAL
+      priority_support:   CRITICAL
     unique: [segment_id]
     data_types:
       segment_id: pl.Int64
@@ -184,24 +244,33 @@ Batch:
       priority_support: pl.Boolean
 
     range:
-      discount_pct: [0, 100]
+      discount_pct: [0, 100, CRITICAL]
 
   teams:
-    not_null: [team_id, team_name]
+    not_null:
+      team_id:    CRITICAL
+      team_name:  CRITICAL
     unique: [team_id]
     data_types:
       team_id: pl.Int64
       team_name: pl.Utf8
 
   channels:
-    not_null: [channel_id, channel_name]
+    not_null:
+      channel_id:    CRITICAL
+      channel_name:  CRITICAL
     unique: [channel_id]
     data_types:
       channel_id: pl.Int64
       channel_name: pl.Utf8
 
   priorities:
-    not_null: [priority_id, priority_code, priority_name, sla_first_response_min, sla_resolution_min]
+    not_null:
+      priority_id:              CRITICAL
+      priority_code:            CRITICAL
+      priority_name:            CRITICAL
+      sla_first_response_min:   CRITICAL
+      sla_resolution_min:       CRITICAL
     unique: [priority_id]
     data_types:
       priority_id: pl.Int64
@@ -210,16 +279,30 @@ Batch:
       sla_first_response_min: pl.Int64
       sla_resolution_min: pl.Int64
     range:
-      sla_first_response_min: [0, 1440]
-      sla_resolution_min: [0, 1440]
+      sla_first_response_min: [0, 1440, WARNING]
+      sla_resolution_min:     [0, 1440, WARNING]
 
 
 Stream:
 
   orders:
-    not_null: [order_id, customer_id, restaurant_id, driver_id, region_id, order_status, payment_method, order_amount, delivery_fee, discount_amount, total_amount, order_created_at, delivered_at]
-    
+    not_null:
+      order_id:            CRITICAL  
+      customer_id:         CRITICAL 
+      restaurant_id:       CRITICAL 
+      driver_id:           CRITICAL 
+      region_id:           CRITICAL 
+      order_status:        CRITICAL  
+      payment_method:      CRITICAL  
+      order_amount:        CRITICAL  
+      delivery_fee:        CRITICAL  
+      discount_amount:     CRITICAL  
+      total_amount:        CRITICAL  
+      order_created_at:    CRITICAL  
+      delivered_at:        WARNING   
+
     data_types:
+      date_format: "%Y-%m-%d %H:%M:%S"
       order_id: pl.Utf8
       customer_id: pl.Int64
       restaurant_id: pl.Int64
@@ -231,15 +314,15 @@ Stream:
       total_amount: pl.Decimal
       order_status: pl.Utf8
       payment_method: pl.Utf8
-      order_created_at: pl.Timestamp
-      delivered_at: pl.Timestamp
-    
+      order_created_at: pl.Timestamp  
+      delivered_at: pl.Timestamp      
+
     unique:   [order_id]
     range:
-      order_amount:    [0.01, 10000]
-      delivery_fee:    [0.0,  500]
-      discount_amount: [0.0,  500]
-      total_amount:    [0.01, 10000]
+      order_amount:    [0.01, 10000, CRITICAL]
+      delivery_fee:    [0.0,  500, CRITICAL]
+      discount_amount: [0.0,  500, CRITICAL]
+      total_amount:    [0.01, 10000, CRITICAL]
     allowed_values:
       order_status:   [Delivered, Cancelled, Refunded]
       payment_method: [card, cash, wallet]
@@ -250,9 +333,22 @@ Stream:
       region_id:     regions.region_id
 
   tickets:
-    not_null: [ticket_id, order_id, customer_id, agent_id, reason_id, priority_id, channel_id, status, created_at]
-    
+    not_null:
+      ticket_id:     CRITICAL 
+      order_id:      CRITICAL 
+      customer_id:   CRITICAL 
+      agent_id:      CRITICAL 
+      reason_id:     CRITICAL
+      priority_id:   CRITICAL  
+      channel_id:    CRITICAL 
+      status:        CRITICAL  
+      created_at:    CRITICAL 
+      driver_id:     WARNING   
+      restaurant_id: WARNING   
+
     data_types:
+      float_to_int: True
+      date_format: "%Y-%m-%d %H:%M:%S"
       ticket_id: pl.Utf8
       order_id: pl.Utf8
       customer_id: pl.Int64
@@ -264,40 +360,48 @@ Stream:
       channel_id: pl.Int64
       status: pl.Utf8
       refund_amount: pl.Decimal
-      created_at: pl.Timestamp
-      first_response_at: pl.Timestamp
-      resolved_at: pl.Timestamp
-      sla_first_due_at: pl.Timestamp
-      sla_resolve_due_at: pl.Timestamp
-    
+      created_at: pl.Timestamp         
+      first_response_at: pl.Timestamp  
+      resolved_at: pl.Timestamp        
+      sla_first_due_at: pl.Timestamp   
+      sla_resolve_due_at: pl.Timestamp 
+
     unique:   [ticket_id]
     allowed_values:
       status: [Open, InProgress, Resolved, Closed, Reopened]
     range:
-      refund_amount: [0.0, 10000]
+      refund_amount: [0.0, 10000, CRITICAL]
     foreign_keys:
-      order_id:    orders.order_id
-      customer_id: customers.customer_id
-      agent_id:    agents.agent_id
-      reason_id:   reasons.reason_id
-      priority_id: priorities.priority_id
-      channel_id:  channels.channel_id
+      order_id:      orders.order_id
+      customer_id:   customers.customer_id
+      agent_id:      agents.agent_id
+      reason_id:     reasons.reason_id
+      priority_id:   priorities.priority_id
+      channel_id:    channels.channel_id
+      driver_id:     drivers.driver_id     
+      restaurant_id: restaurants.restaurant_id 
 
   ticket_events:
-    not_null: [event_id, ticket_id, agent_id, event_ts, new_status]
-    
+    not_null:
+      event_id:    CRITICAL  
+      ticket_id:   CRITICAL 
+      agent_id:    CRITICAL  
+      event_ts:    CRITICAL
+      new_status:  CRITICAL  
+
     data_types:
+      date_format: "%Y-%m-%d %H:%M:%S"
       event_id: pl.Utf8
       ticket_id: pl.Utf8
       agent_id: pl.Int64
-      event_ts: pl.Timestamp
+      event_ts: pl.Timestamp   
       old_status: pl.Utf8
       new_status: pl.Utf8
       notes: pl.Utf8
-    
+
     unique: [event_id]
     allowed_values:
-      new_status: [Open, InProgress, Resolved, Closed, Reopened]
+      status: [Open, InProgress, Resolved, Closed, Reopened]  
     foreign_keys:
       ticket_id: tickets.ticket_id
       agent_id:  agents.agent_id
