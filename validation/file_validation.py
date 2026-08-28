@@ -2,8 +2,8 @@ import sys
 import polars as pl
 from pathlib import Path
 from dataclasses import dataclass
-
-
+from validation.pii_masking import pii_mask
+from validation.quarantine_writer import store_quarantine
 # -------------------------- Handling Paths --------------------------
 root = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(root))
@@ -67,6 +67,13 @@ def validate_file(lf: pl.LazyFrame, file_type: str, source_table: str) -> Valida
         f"{total_rows - quarantined_count} total will load."
     )
 
+    try:
+        lf_with_pii_masked = pii_mask(quarantine_lf,layer_key,source_table)
+        print(lf_with_pii_masked.collect())
+    except Exception as e:
+        print(f"Error during PII masking: {e}")
+
+    store_quarantine()
     return ValidationResult(
         valid_lf=valid_lf,
         quarantine_lf=quarantine_lf,

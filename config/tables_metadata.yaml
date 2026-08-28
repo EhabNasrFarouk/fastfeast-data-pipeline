@@ -35,6 +35,11 @@ Batch:
         region_id:  regions.region_id
         segment_id: segments.segment_id
 
+      pii:
+        full_name: mask
+        email: mask
+        phone: mask
+
   drivers:
     not_null:
       driver_id:              CRITICAL 
@@ -82,6 +87,11 @@ Batch:
       national_id: '^[2-3][0-9]{13}$'
     foreign_keys:
       region_id: regions.region_id
+
+    pii:
+      driver_name: mask
+      driver_phone: mask
+      national_id: hash
 
   restaurants:
     not_null:
@@ -161,6 +171,11 @@ Batch:
 
     foreign_keys:
       team_id: teams.team_id
+
+    pii:
+      agent_name: mask
+      agent_email: mask
+      agent_phone: mask
 
   cities:
     not_null:
