@@ -32,6 +32,8 @@ def null_validator(lf: pl.LazyFrame, not_null_rules: dict[str, str]) -> pl.LazyF
         )
         error_frames.append(errors)
 
+    pl.concat(error_frames).collect()
+    print("NULL Validation", "\n------------------------------------\n")
     return empty_errors() if not error_frames else pl.concat(error_frames)
 
 
@@ -55,11 +57,13 @@ def duplicate_validator(lf: pl.LazyFrame, columns: list[str]) -> pl.LazyFrame | 
         )
         error_frames.append(errors)
 
+    pl.concat(error_frames).collect()
+    print("Duplicate Validation", "\n------------------------------------\n")
     return empty_errors() if not error_frames else pl.concat(error_frames)
 
 
 # ------------------------------ Data Type Validator ------------------------------
-def data_type_validator(lf: pl.LazyFrame, columns: dict[str, list]) -> pl.LazyFrame | None:
+def data_type_validator(lf: pl.LazyFrame, columns: dict[str, list], date_formats=None) -> pl.LazyFrame | None:
     error_frames = []
     STR_TO_DTYPE = {
         "pl.Int64": pl.Int64,
@@ -71,14 +75,14 @@ def data_type_validator(lf: pl.LazyFrame, columns: dict[str, list]) -> pl.LazyFr
         "pl.Time": pl.Time
     }
 
-    date_format = "%m/%d/%Y %H:%M"
+    # date_format = "%m/%d/%Y %H:%M"
     float_to_int = False
     for col_nm, data_type in columns.items():
         # Handling date formats & converting from float to int
-        if col_nm == "date_format":
-            date_format = data_type
-            continue
-        elif col_nm == "float_to_int":
+        # if col_nm == "date_format":
+        #     date_format = data_type
+        #     continue
+        if col_nm == "float_to_int":
             float_to_int = True
             continue
 
@@ -88,14 +92,14 @@ def data_type_validator(lf: pl.LazyFrame, columns: dict[str, list]) -> pl.LazyFr
         parsed_expr = pl.col(col_nm).cast(STR_TO_DTYPE[data_type], strict=False)
 
         if target_type == pl.Date:
-            parsed_expr = pl.col(col_nm).str.to_date("%m/%d/%Y", strict=False)
-
+            parsed_expr = pl.col(col_nm).str.to_date(date_formats[col_nm], strict=False)
+        
         elif target_type == pl.Datetime:
-            parsed_expr = pl.col(col_nm).str.to_datetime(date_format, strict=False)
+            parsed_expr = pl.col(col_nm).str.to_datetime(date_formats[col_nm], strict=False)
 
         elif target_type == pl.Time:
             parsed_expr = pl.col(col_nm).str.replace(r"\.[0-9]$", "").str.to_time("%H:%M", strict=False)
-
+        
         elif target_type == pl.Int64 and float_to_int:
             parsed_expr = pl.col(col_nm).cast(pl.Float64).cast(pl.Int64, strict=False)
 
@@ -122,6 +126,8 @@ def data_type_validator(lf: pl.LazyFrame, columns: dict[str, list]) -> pl.LazyFr
         )
         error_frames.append(errors)
 
+    pl.concat(error_frames).collect()
+    print("Date Type Validation", "\n------------------------------------\n")
     return empty_errors() if not error_frames else pl.concat(error_frames)
 
 # ------------------------------ Range Validator ------------------------------
@@ -152,6 +158,8 @@ def range_validator(lf: pl.LazyFrame, range_rules: dict[str, list]) -> pl.LazyFr
         )
         error_frames.append(errors)
 
+    pl.concat(error_frames).collect()
+    print("Range Validation", "\n------------------------------------\n")
     return empty_errors() if not error_frames else pl.concat(error_frames)
 
 
@@ -173,6 +181,8 @@ def regex_validator(lf: pl.LazyFrame, regex_rules: dict[str, str]) -> pl.LazyFra
         )
         error_frames.append(errors)
 
+    pl.concat(error_frames).collect()
+    print("Regex Validation", "\n------------------------------------\n")
     return empty_errors() if not error_frames else pl.concat(error_frames)
 
 
@@ -194,4 +204,6 @@ def allowed_values_validator(lf: pl.LazyFrame, allowed_values_rules: dict[str, l
         )
         error_frames.append(errors)
 
+    pl.concat(error_frames).collect()
+    print("Allowed Value Validation", "\n------------------------------------\n")
     return empty_errors() if not error_frames else pl.concat(error_frames)

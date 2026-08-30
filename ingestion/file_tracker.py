@@ -21,6 +21,7 @@ def get_connection():
 
 PIPELINE_VERSION = load_config()["project"]["version"]  
 
+# ---------------------------- File Tracking ----------------------------
 def init_tracker_table(con=None):
     """Create the file-tracking table if it doesn't exist."""
     close_after = con is None
@@ -149,6 +150,21 @@ def start_file_tracking(filepath, run_id, layer, source_table, run_date, run_hou
     return file_id
 
 
+def change_file_phase(run_id: str, source_table: str, phase: str):
+    # Opening connection
+    conn = get_connection()
+    
+    # updating the file phase
+    conn.execute("""
+        UPDATE etl_file_tracker
+        SET layer = ?
+        WHERE run_id = ? AND source_table = ?;
+    """, [phase, run_id, source_table])
+
+    # Closing connection 
+    conn.close()
+
+
 def mark_processed(file_id, status="success", rows_read=0, rows_inserted=0,
                     rows_rejected=0, error_message=None, con=None):
     """Update the tracking record once a file has finished processing."""
@@ -207,3 +223,26 @@ def get_processing_history(layer=None, run_id=None, con=None):
         con.close()
 
     return df
+
+
+# ---------------------------- Logging ----------------------------
+def init_logging():
+    conn = get_connection()
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS validation_log (
+            id               UUID PRIMARY KEY DEFAULT uuidv7(),
+            run_id           VARCHAR,
+            filepath         VARCHAR,
+            file_type        VARCHAR,
+            source_table     VARCHAR,
+            severity         VARCHAR,
+            record_idx       VARCHAR,
+            error_category   VARCHAR,
+            column_name      VARCHAR,
+            invalid_value    VARCHAR,
+            logged_at        TIMESTAMP
+        )
+    """)
+
+    conn.close()
