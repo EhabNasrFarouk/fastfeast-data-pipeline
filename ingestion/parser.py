@@ -29,12 +29,12 @@ def handle_error(run_id: str, source_table: str, error_msg):
 
 def read_file(file_path: str, run_id: str, source_table: str) -> pl.LazyFrame | None:
     path = Path(file_path)
-    print(f"Parsing Phase for {source_table} table.", "\n------------------------------------\n")
+    # print(f"Parsing Phase for {source_table} table.", "\n------------------------------------\n")
 
     # Getting the table columns from the metadata file.
     file_type = "Stream" if source_table in ["orders", "tickets", "ticket_events"] else "Batch"
     columns = load_metadata()[file_type][source_table]["data_types"].keys()
-    excluded = ["date_format", "float_to_int"]
+    excluded = ["float_to_int"]
     dynamic_overrides = {col_nm: pl.String for col_nm in columns if col_nm not in excluded}
 
     try:

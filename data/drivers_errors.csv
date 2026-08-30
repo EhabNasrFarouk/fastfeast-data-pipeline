@@ -1,0 +1,9 @@
+row_number,column_name,error_type,invalid_value,severity
+51,driver_name,NULL_VALUE,,CRITICAL
+84,driver_name,NULL_VALUE,,CRITICAL
+96,driver_phone,NULL_VALUE,,WARNING
+101,driver_phone,NULL_VALUE,,WARNING
+100,driver_id,DUPLICATE_KEY,76,CRITICAL
+100,national_id,DUPLICATE_KEY,260367398153116,CRITICAL
+11,driver_phone,REGEX_MISMATCH,abc12345,WARNING
+83,national_id,REGEX_MISMATCH,123,WARNING

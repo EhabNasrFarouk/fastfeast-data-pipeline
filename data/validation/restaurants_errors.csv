@@ -1,0 +1,5 @@
+row_number,column_name,error_type,invalid_value,severity
+31,restaurant_name,NULL_VALUE,,WARNING
+32,restaurant_name,NULL_VALUE,,WARNING
+34,restaurant_name,NULL_VALUE,,WARNING
+12,rating_avg,NULL_VALUE,,WARNING

@@ -11,7 +11,13 @@ Batch:
         gender:       WARNING    
         email:        WARNING    
 
+      date_formats:
+        created_at: "%Y-%m-%d %H:%M:%S%.f"
+        updated_at: "%Y-%m-%d %H:%M:%S%.f"
+        signup_date: "%Y-%m-%d"
+
       data_types:
+        float_to_int: True
         customer_id:  pl.Int64
         full_name:  pl.Utf8
         email:  pl.Utf8
@@ -21,7 +27,7 @@ Batch:
         signup_date:  pl.Date
         gender: pl.Utf8
         created_at: pl.Timestamp    
-        updated_at: pl.Time   
+        updated_at: pl.Timestamp   
 
       unique:    [customer_id]
       regex:
@@ -51,6 +57,11 @@ Batch:
       completed_deliveries:         WARNING   
       is_active:                     WARNING   
 
+    date_formats:
+      created_at: "%Y-%m-%d %H:%M:%S%.f"
+      updated_at: "%Y-%m-%d %H:%M:%S%.f"
+      hire_date: "%Y-%m-%d"
+
     data_types:
       driver_id:  pl.Int64
       driver_name:  pl.Utf8
@@ -66,7 +77,7 @@ Batch:
       completed_deliveries: pl.Int64
       is_active:  pl.Boolean
       created_at: pl.Timestamp  
-      updated_at: pl.Time
+      updated_at: pl.Timestamp
 
     unique:   [driver_id, national_id]  
     range:
@@ -79,7 +90,7 @@ Batch:
       vehicle_type: [bike, motorbike, car]
     regex:
       driver_phone: '^01[0-25][0-9]{8}$'
-      national_id: '^[2-3][0-9]{13}$'
+      national_id: '^[2-3][0-9]{14}$'
     foreign_keys:
       region_id: regions.region_id
 
@@ -93,6 +104,10 @@ Batch:
       is_active:                    WARNING  
       rating_avg:                     WARNING   
       prep_time_avg_min:                 WARNING  
+
+    date_formats:
+      created_at: "%Y-%m-%d %H:%M:%S"
+      updated_at: "%Y-%m-%d %H:%M:%S%.f"
 
     data_types:
       restaurant_id:  pl.Int64
@@ -130,6 +145,11 @@ Batch:
       resolution_rate:                        WARNING   
       csat_score:                               WARNING   
 
+    date_formats:
+      created_at: "%Y-%m-%d %H:%M:%S%.f"
+      updated_at: "%Y-%m-%d %H:%M:%S%.f"
+      hire_date: "%Y-%m-%d"
+
     data_types:
       agent_id: pl.Int64
       agent_name: pl.Utf8
@@ -143,7 +163,7 @@ Batch:
       csat_score: pl.Decimal
       is_active:  pl.Boolean
       created_at: pl.Timestamp  
-      updated_at: pl.Time   
+      updated_at: pl.Timestamp   
 
     unique:   [agent_id]
 
@@ -301,8 +321,11 @@ Stream:
       order_created_at:    CRITICAL  
       delivered_at:        WARNING   
 
+    date_formats:
+      order_created_at: "%Y-%m-%d %H:%M:%S"
+      delivered_at: "%Y-%m-%d %H:%M:%S"
+
     data_types:
-      date_format: "%Y-%m-%d %H:%M:%S"
       order_id: pl.Utf8
       customer_id: pl.Int64
       restaurant_id: pl.Int64
@@ -346,9 +369,15 @@ Stream:
       driver_id:     WARNING   
       restaurant_id: WARNING   
 
+    date_formats:
+      created_at: "%Y-%m-%d %H:%M:%S"
+      first_response_at: "%Y-%m-%d %H:%M:%S"
+      resolved_at: "%Y-%m-%d %H:%M:%S"
+      sla_first_due_at: "%Y-%m-%d %H:%M:%S"
+      sla_resolve_due_at: "%Y-%m-%d %H:%M:%S"
+
     data_types:
       float_to_int: True
-      date_format: "%Y-%m-%d %H:%M:%S"
       ticket_id: pl.Utf8
       order_id: pl.Utf8
       customer_id: pl.Int64
@@ -387,10 +416,12 @@ Stream:
       ticket_id:   CRITICAL 
       agent_id:    CRITICAL  
       event_ts:    CRITICAL
-      new_status:  CRITICAL  
+      new_status:  CRITICAL
+
+    date_formats:
+      event_ts: "%Y-%m-%d %H:%M:%S"
 
     data_types:
-      date_format: "%Y-%m-%d %H:%M:%S"
       event_id: pl.Utf8
       ticket_id: pl.Utf8
       agent_id: pl.Int64
@@ -400,8 +431,11 @@ Stream:
       notes: pl.Utf8
 
     unique: [event_id]
+
     allowed_values:
-      status: [Open, InProgress, Resolved, Closed, Reopened]  
+      # [Open, InProgress, Resolved, Closed, Reopened]
+      new_status: [Open, InProgress, Resolved, Closed, Reopened]
+
     foreign_keys:
       ticket_id: tickets.ticket_id
       agent_id:  agents.agent_id
