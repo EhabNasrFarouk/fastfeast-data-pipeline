@@ -10,7 +10,8 @@ sys.path.insert(0, str(root))
 from validation.validators import *
 from config.config_loader import load_metadata
 from validation.logger import logging_errors
-
+from validation.pii_masking import pii_mask
+from validation.logger import store_quarantine
 
 RULES = {
     "not_null": null_validator,
@@ -39,7 +40,7 @@ def validate_file(run_id: str, file_path: str, lf: pl.LazyFrame, file_type: str,
     layer_key = file_type.strip().title()
     table_rules = metadata[layer_key][source_table]
 
-    # Appluing validations on the table
+    # Applying validations on the table
     error_frames = [empty_errors()]
     date_formats = table_rules["date_formats"] if "date_formats" in table_rules else {}
     for rule_key, validator_fn in RULES.items():
@@ -53,13 +54,35 @@ def validate_file(run_id: str, file_path: str, lf: pl.LazyFrame, file_type: str,
 
     errors_lf = pl.concat(error_frames)
 
+    # PII Masking
+    lf = pii_mask(lf,layer_key,source_table)
+
     # Logging the errors
-    logging_errors(run_id, file_path, file_type, source_table, errors_lf)    
+    logging_errors(run_id, file_path, file_type, source_table, errors_lf) 
+
+    # Putting bad records in the quearntine
+    critical_rows = (
+        errors_lf.filter(pl.col("severity") == "CRITICAL")
+        .select(["row_number", "column_name", "error_type", "invalid_value"])
+    )
+    quarantine_lf = lf.join(
+        critical_rows.select(["row_number", "column_name", "error_type", "invalid_value"]),
+        on="row_number",
+        how="inner"
+    )
+    store_quarantine(quarantine_lf, file_path, run_id, file_type, source_table)
+
+    # Updating Tracking Table (rows_cnt)
 
     # Showing Result
-    lf.collect().write_csv(f"data/{source_table}.csv")
-    errors_lf.collect().write_csv(f"data/{source_table}_errors.csv")
+    # lf.collect().write_csv(f"data/{source_table}.csv")
+    # errors_lf.collect().write_csv(f"data/{source_table}_errors.csv")
 
+    # Returning the valid frame
+    # valid_lf = lf.join(critical_rows, on="row_number", how="anti")
+    # return valid_lf
+
+    # ********************************************************************************
     # critical_rows = (
     #     errors_lf.filter(pl.col("severity") == "CRITICAL")
     #     .select("row_number").unique()
@@ -116,7 +139,7 @@ def validate_file(run_id: str, file_path: str, lf: pl.LazyFrame, file_type: str,
 # dynamic_overrides = {col_nm: pl.String for col_nm in validation_cols}
 
 # ----------------------------- CSVS -----------------------------
-# file_path = "F:\\ITI\\17-Python\\New Project\\FastFeast\\validation-log branch\\fastfeast-data-pipeline\\data\\input\\batch\\2026-08-27\\drivers.csv"
+# file_path = "F:\\ITI\\17-Python\\New Project\\FastFeast\\full-logging\\fastfeast-data-pipeline\\data\\input\\batch\\2026-06-14\\drivers.csv"
 # validation_cols = md["Batch"]["drivers"]["data_types"].keys()
 
 # excluded = ["float_to_int"]

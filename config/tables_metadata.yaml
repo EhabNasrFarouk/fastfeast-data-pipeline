@@ -41,6 +41,11 @@ Batch:
         region_id:  regions.region_id
         segment_id: segments.segment_id
 
+      pii:
+        full_name: mask
+        email: mask
+        phone: mask
+
   drivers:
     not_null:
       driver_id:              CRITICAL 
@@ -80,19 +85,28 @@ Batch:
       updated_at: pl.Timestamp
 
     unique:   [driver_id, national_id]  
+    
     range:
       rating_avg:            [1.0, 5.0, WARNING]
       on_time_rate:          [0.0, 1.0, WARNING]
       cancel_rate:           [0.0, 1.0, WARNING]
       completed_deliveries:  [0, INF, WARNING]
+    
     allowed_values:
       shift:        [morning, evening, night]
       vehicle_type: [bike, motorbike, car]
+    
     regex:
       driver_phone: '^01[0-25][0-9]{8}$'
       national_id: '^[2-3][0-9]{14}$'
+    
     foreign_keys:
       region_id: regions.region_id
+
+    pii:
+      driver_name: mask
+      driver_phone: mask
+      national_id: hash
 
   restaurants:
     not_null:
@@ -181,6 +195,11 @@ Batch:
 
     foreign_keys:
       team_id: teams.team_id
+
+    pii:
+      agent_name: mask
+      agent_email: mask
+      agent_phone: mask
 
   cities:
     not_null:

@@ -229,6 +229,7 @@ def get_processing_history(layer=None, run_id=None, con=None):
 def init_logging():
     conn = get_connection()
 
+    # Validation Log Table
     conn.execute("""
         CREATE TABLE IF NOT EXISTS validation_log (
             id               UUID PRIMARY KEY DEFAULT uuidv7(),
@@ -242,6 +243,22 @@ def init_logging():
             column_name      VARCHAR,
             invalid_value    VARCHAR,
             logged_at        TIMESTAMP
+        )
+    """)
+
+    # Quarntine Table
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS quarantine (
+            id                UUID PRIMARY KEY DEFAULT uuidv7(),
+            run_id            VARCHAR,
+            file_path         VARCHAR,
+            file_type         VARCHAR,
+            source            VARCHAR,
+            record_idx        VARCHAR,
+            record_raw        VARCHAR,
+            quarantine_reason VARCHAR,
+            quarantined_at    TIMESTAMP
+
         )
     """)
 
