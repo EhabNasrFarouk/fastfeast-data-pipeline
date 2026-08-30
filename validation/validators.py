@@ -32,8 +32,8 @@ def null_validator(lf: pl.LazyFrame, not_null_rules: dict[str, str]) -> pl.LazyF
         )
         error_frames.append(errors)
 
-    pl.concat(error_frames).collect()
-    print("NULL Validation", "\n------------------------------------\n")
+    # pl.concat(error_frames).collect()
+    # print("NULL Validation", "\n------------------------------------\n")
     return empty_errors() if not error_frames else pl.concat(error_frames)
 
 
@@ -57,8 +57,8 @@ def duplicate_validator(lf: pl.LazyFrame, columns: list[str]) -> pl.LazyFrame | 
         )
         error_frames.append(errors)
 
-    pl.concat(error_frames).collect()
-    print("Duplicate Validation", "\n------------------------------------\n")
+    # pl.concat(error_frames).collect()
+    # print("Duplicate Validation", "\n------------------------------------\n")
     return empty_errors() if not error_frames else pl.concat(error_frames)
 
 
@@ -126,8 +126,8 @@ def data_type_validator(lf: pl.LazyFrame, columns: dict[str, list], date_formats
         )
         error_frames.append(errors)
 
-    pl.concat(error_frames).collect()
-    print("Date Type Validation", "\n------------------------------------\n")
+    # pl.concat(error_frames).collect()
+    # print("Date Type Validation", "\n------------------------------------\n")
     return empty_errors() if not error_frames else pl.concat(error_frames)
 
 # ------------------------------ Range Validator ------------------------------
@@ -158,8 +158,8 @@ def range_validator(lf: pl.LazyFrame, range_rules: dict[str, list]) -> pl.LazyFr
         )
         error_frames.append(errors)
 
-    pl.concat(error_frames).collect()
-    print("Range Validation", "\n------------------------------------\n")
+    # pl.concat(error_frames).collect()
+    # print("Range Validation", "\n------------------------------------\n")
     return empty_errors() if not error_frames else pl.concat(error_frames)
 
 
@@ -181,8 +181,8 @@ def regex_validator(lf: pl.LazyFrame, regex_rules: dict[str, str]) -> pl.LazyFra
         )
         error_frames.append(errors)
 
-    pl.concat(error_frames).collect()
-    print("Regex Validation", "\n------------------------------------\n")
+    # pl.concat(error_frames).collect()
+    # print("Regex Validation", "\n------------------------------------\n")
     return empty_errors() if not error_frames else pl.concat(error_frames)
 
 
@@ -204,6 +204,6 @@ def allowed_values_validator(lf: pl.LazyFrame, allowed_values_rules: dict[str, l
         )
         error_frames.append(errors)
 
-    pl.concat(error_frames).collect()
-    print("Allowed Value Validation", "\n------------------------------------\n")
+    # pl.concat(error_frames).collect()
+    # print("Allowed Value Validation", "\n------------------------------------\n")
     return empty_errors() if not error_frames else pl.concat(error_frames)
